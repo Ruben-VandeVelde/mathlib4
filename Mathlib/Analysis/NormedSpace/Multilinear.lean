@@ -55,6 +55,8 @@ the final result is independent of the order. While everything could be done fol
 approach, it turns out that direct proofs are easier and more efficient.
 -/
 
+set_option profiler true
+
 
 noncomputable section
 
@@ -1017,31 +1019,55 @@ theorem _root_.ContinuousLinearEquiv.compContinuousMultilinearMapL_apply (g : G 
   rfl
 #align continuous_linear_equiv.comp_continuous_multilinear_mapL_apply ContinuousLinearEquiv.compContinuousMultilinearMapL_apply
 
+set_option trace.profiler true in
+set_option trace.Meta.isDefEq true in
+@[simps!? apply]
+def flipMultilinear_auxLM (f : G →L[𝕜] ContinuousMultilinearMap 𝕜 E G') (m : (i : ι) → E i)  :
+    G →ₗ[𝕜] G' :=
+  { toFun := fun x => f x m
+    map_add' := fun x y => by simp only [map_add, ContinuousMultilinearMap.add_apply]
+    map_smul' := fun c x => by
+      simp only [ContinuousMultilinearMap.smul_apply, map_smul, RingHom.id_apply] }
+
+set_option trace.profiler true in
+set_option trace.Meta.isDefEq true in
+@[simps!? apply_apply]
+def flipMultilinear_aux (f : G →L[𝕜] ContinuousMultilinearMap 𝕜 E G') :
+    MultilinearMap 𝕜 E (G →L[𝕜] G') :=
+  { toFun := fun m =>
+      LinearMap.mkContinuous
+        (flipMultilinear_auxLM f m)
+        -- { toFun := fun x => f x m
+        --   map_add' := fun x y => by simp only [map_add, ContinuousMultilinearMap.add_apply]
+        --   map_smul' := fun c x => by
+        --     simp only [ContinuousMultilinearMap.smul_apply, map_smul, RingHom.id_apply] }
+        (‖f‖ * ∏ i, ‖m i‖) fun x => by
+        rw [mul_right_comm]
+        exact (f x).le_of_op_norm_le _ (f.le_op_norm x)
+    map_add' := fun m i x y => by
+      ext1
+      simp only [ne_eq, LinearMap.mkContinuous_apply, flipMultilinear_auxLM_apply,
+        ContinuousMultilinearMap.map_add, add_apply]
+    map_smul' := fun m i c x => by
+      ext1
+      simp only [ne_eq, LinearMap.mkContinuous_apply, flipMultilinear_auxLM_apply,
+        ContinuousMultilinearMap.map_smul, coe_smul', Pi.smul_apply] }
+
+theorem flipMultilinear_aux_apply
+    (f : G →L[𝕜] ContinuousMultilinearMap 𝕜 E G') (m : (i : ι) → E i) :
+    flipMultilinear_aux f m = flipMultilinear_auxLM f m := rfl
+
+
+set_option trace.profiler true in
+set_option trace.Meta.isDefEq true in
 /-- Flip arguments in `f : G →L[𝕜] ContinuousMultilinearMap 𝕜 E G'` to get
 `ContinuousMultilinearMap 𝕜 E (G →L[𝕜] G')` -/
 @[simps! apply_apply]
 def flipMultilinear (f : G →L[𝕜] ContinuousMultilinearMap 𝕜 E G') :
     ContinuousMultilinearMap 𝕜 E (G →L[𝕜] G') :=
-  MultilinearMap.mkContinuous
-    { toFun := fun m =>
-        LinearMap.mkContinuous
-          { toFun := fun x => f x m
-            map_add' := fun x y => by simp only [map_add, ContinuousMultilinearMap.add_apply]
-            map_smul' := fun c x => by
-              simp only [ContinuousMultilinearMap.smul_apply, map_smul, RingHom.id_apply] }
-          (‖f‖ * ∏ i, ‖m i‖) fun x => by
-          rw [mul_right_comm]
-          exact (f x).le_of_op_norm_le _ (f.le_op_norm x)
-      map_add' := fun m i x y => by
-        ext1
-        simp only [add_apply, ContinuousMultilinearMap.map_add, LinearMap.coe_mk,
-          LinearMap.mkContinuous_apply, AddHom.coe_mk]
-      map_smul' := fun m i c x => by
-        ext1
-        simp only [coe_smul', ContinuousMultilinearMap.map_smul, LinearMap.coe_mk,
-          LinearMap.mkContinuous_apply, Pi.smul_apply, AddHom.coe_mk] }
+  MultilinearMap.mkContinuous (flipMultilinear_aux f)
     ‖f‖ fun m => by
-      dsimp only [MultilinearMap.coe_mk]
+      simp only [flipMultilinear_aux, MultilinearMap.coe_mk]
       refine LinearMap.mkContinuous_norm_le _
         (mul_nonneg (norm_nonneg f) (prod_nonneg fun i _ => norm_nonneg (m i))) _
 #align continuous_linear_map.flip_multilinear ContinuousLinearMap.flipMultilinear
