@@ -41,7 +41,7 @@ for a version giving an equivalence when there is decidable equality. -/
 @[simps]
 def getBijectionOfForallMemList (l : List α) (nd : l.Nodup) (h : ∀ x : α, x ∈ l) :
     { f : Fin l.length → α // Function.Bijective f } :=
-  ⟨fun i => l.get i, fun _ _ h => Fin.ext <| (nd.nthLe_inj_iff _ _).1 h,
+  ⟨fun i => l.get i, fun _ _ => nd.get_inj_iff.1,
    fun x =>
     let ⟨i, hl⟩ := List.mem_iff_get.1 (h x)
     ⟨i, hl⟩⟩
@@ -233,19 +233,7 @@ theorem duplicate_iff_exists_distinct_get {l : List α} {x : α} :
       · rintro ⟨⟨_ | i⟩, hi⟩
         · simpa using h
         · simpa using h'
-
-/-- An element `x : α` of `l : List α` is a duplicate iff it can be found
-at two distinct indices `n m : ℕ` inside the list `l`.
--/
-@[deprecated duplicate_iff_exists_distinct_get]
-theorem duplicate_iff_exists_distinct_nthLe {l : List α} {x : α} :
-    l.Duplicate x ↔
-      ∃ (n : ℕ) (hn : n < l.length) (m : ℕ) (hm : m < l.length) (_ : n < m),
-        x = l.nthLe n hn ∧ x = l.nthLe m hm :=
-  duplicate_iff_exists_distinct_get.trans
-    ⟨fun ⟨n, m, h⟩ => ⟨n.1, n.2, m.1, m.2, h⟩,
-    fun ⟨n, hn, m, hm, h⟩ => ⟨⟨n, hn⟩, ⟨m, hm⟩, h⟩⟩
-#align list.duplicate_iff_exists_distinct_nth_le List.duplicate_iff_exists_distinct_nthLe
+#align list.duplicate_iff_exists_distinct_nth_le List.duplicate_iff_exists_distinct_getₓ
 
 end Sublist
 
