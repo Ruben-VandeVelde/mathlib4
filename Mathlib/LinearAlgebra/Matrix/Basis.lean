@@ -92,8 +92,8 @@ theorem toMatrix_update [DecidableEq ι'] (x : M) :
   ext i' k
   rw [Basis.toMatrix, Matrix.updateColumn_apply, e.toMatrix_apply]
   split_ifs with h
-  · rw [h, update_same j x v]
-  · rw [update_noteq h]
+  · rw [h, of_apply, update_same j x v]
+  · rw [of_apply, update_noteq h]
 #align basis.to_matrix_update Basis.toMatrix_update
 
 /-- The basis constructed by `unitsSMul` has vectors given by a diagonal matrix. -/
