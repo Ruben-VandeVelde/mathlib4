@@ -63,7 +63,7 @@ def detRowAlternating : AlternatingMap R (n → R) R n :=
 
 /-- The determinant of a matrix given by the Leibniz formula. -/
 abbrev det (M : Matrix n n R) : R :=
-  detRowAlternating M
+  detRowAlternating (of.symm M)
 #align matrix.det Matrix.det
 
 theorem det_apply (M : Matrix n n R) : M.det = ∑ σ : Perm n, Equiv.Perm.sign σ • ∏ i, M (σ i) i :=
@@ -238,7 +238,7 @@ theorem det_transpose (M : Matrix n n R) : Mᵀ.det = M.det := by
 
 /-- Permuting the columns changes the sign of the determinant. -/
 theorem det_permute (σ : Perm n) (M : Matrix n n R) :
-    (Matrix.det fun i => M (σ i)) = Perm.sign σ * M.det :=
+    (Matrix.det (of fun i => M (σ i))) = Perm.sign σ * M.det :=
   ((detRowAlternating : AlternatingMap R (n → R) R n).map_perm M σ).trans (by simp [Units.smul_def])
 #align matrix.det_permute Matrix.det_permute
 

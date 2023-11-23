@@ -638,10 +638,12 @@ theorem Basis.det_map' (b : Basis ι R M) (f : M ≃ₗ[R] M') :
 #align basis.det_map' Basis.det_map'
 
 @[simp]
-theorem Pi.basisFun_det : (Pi.basisFun R ι).det = Matrix.detRowAlternating := by
-  ext M
-  rw [Basis.det_apply, Basis.coePiBasisFun.toMatrix_eq_transpose, det_transpose]
-#align pi.basis_fun_det Pi.basisFun_det
+theorem Pi.basisFun_det_apply (M : ι → ι → R) : (Pi.basisFun R ι).det M = Matrix.detRowAlternating M := by
+  rw [Basis.det_apply, Basis.coePiBasisFun.toMatrix_eq_transpose, Function.comp_apply,
+    det_transpose, det]
+  rfl
+  done
+#noalign pi.basis_fun_det
 
 /-- If we fix a background basis `e`, then for any other basis `v`, we can characterise the
 coordinates provided by `v` in terms of determinants relative to `e`. -/
