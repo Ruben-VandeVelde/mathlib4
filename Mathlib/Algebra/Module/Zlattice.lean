@@ -340,8 +340,7 @@ theorem volume_fundamentalDomain [Fintype ι] [DecidableEq ι] (b : Basis ι ℝ
     volume (fundamentalDomain b) = ENNReal.ofReal |(Matrix.of b).det| := by
   rw [measure_fundamentalDomain b volume (b₀ := Pi.basisFun ℝ ι), fundamentalDomain_pi_basisFun,
     volume_pi, Measure.pi_pi, Real.volume_Ico, sub_zero, ENNReal.ofReal_one, Finset.prod_const_one,
-    mul_one, ← Matrix.det_transpose]
-  rfl
+    mul_one, Basis.coePiBasisFun.toMatrix_eq_transpose, Function.comp_apply, Matrix.det_transpose]
 
 end Real
 

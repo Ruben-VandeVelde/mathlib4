@@ -52,7 +52,8 @@ open Function Matrix
 
 /-- From a basis `e : ι → M` and a family of vectors `v : ι' → M`, make the matrix whose columns
 are the vectors `v i` written in the basis `e`. -/
-def Basis.toMatrix (e : Basis ι R M) (v : ι' → M) : Matrix ι ι' R := fun i j => e.repr (v j) i
+def Basis.toMatrix (e : Basis ι R M) (v : ι' → M) : Matrix ι ι' R :=
+  Matrix.of fun i j => e.repr (v j) i
 #align basis.to_matrix Basis.toMatrix
 
 variable (e : Basis ι R M) (v : ι' → M) (i : ι) (j : ι')
@@ -75,8 +76,7 @@ theorem toMatrix_eq_toMatrix_constr [Fintype ι] [DecidableEq ι] (v : ι → M)
 
 -- TODO (maybe) Adjust the definition of `Basis.toMatrix` to eliminate the transpose.
 theorem coePiBasisFun.toMatrix_eq_transpose [Fintype ι] :
-    ((Pi.basisFun R ι).toMatrix : Matrix ι ι R → Matrix ι ι R) = Matrix.transpose := by
-  ext M i j
+    ((Pi.basisFun R ι).toMatrix : Matrix ι ι R → Matrix ι ι R) = Matrix.transpose ∘ Matrix.of := by
   rfl
 #align basis.coe_pi_basis_fun.to_matrix_eq_transpose Basis.coePiBasisFun.toMatrix_eq_transpose
 
