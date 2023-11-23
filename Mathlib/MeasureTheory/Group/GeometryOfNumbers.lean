@@ -58,6 +58,8 @@ theorem exists_pair_mem_lattice_not_disjoint_vadd [AddCommGroup L] [Countable L]
       (measure_mono <| Set.iUnion_subset fun _ => Set.inter_subset_right _ _)
 #align measure_theory.exists_pair_mem_lattice_not_disjoint_vadd MeasureTheory.exists_pair_mem_lattice_not_disjoint_vadd
 
+binder_predicate x " ≠ " y:term => `($x ≠ $y)
+
 /-- The **Minkowski Convex Body Theorem**. If `s` is a convex symmetric domain of `E` whose volume
 is large enough compared to the covolume of a lattice `L` of `E`, then it contains a non-zero
 lattice point of `L`.  -/
@@ -65,7 +67,7 @@ theorem exists_ne_zero_mem_lattice_of_measure_mul_two_pow_lt_measure [NormedAddC
     [NormedSpace ℝ E] [BorelSpace E] [FiniteDimensional ℝ E] [IsAddHaarMeasure μ]
     {L : AddSubgroup E} [Countable L] (fund : IsAddFundamentalDomain L F μ)
     (h_symm : ∀ x ∈ s, -x ∈ s) (h_conv : Convex ℝ s) (h : μ F * 2 ^ finrank ℝ E < μ s) :
-    ∃ (x : _) (_ : x ≠ 0), ((x : L) : E) ∈ s := by
+    ∃ x ≠ 0, ((x : L) : E) ∈ s := by
   have h_vol : μ F < μ ((2⁻¹ : ℝ) • s) := by
     rw [addHaar_smul_of_nonneg μ (by norm_num : 0 ≤ (2 : ℝ)⁻¹) s, ←
       mul_lt_mul_right (pow_ne_zero (finrank ℝ E) (two_ne_zero' _)) (pow_ne_top two_ne_top),
@@ -94,7 +96,7 @@ theorem exists_ne_zero_mem_lattice_of_measure_mul_two_pow_le_measure [NormedAddC
     {L : AddSubgroup E} [Countable L] [DiscreteTopology L] (fund : IsAddFundamentalDomain L F μ)
     (h_symm : ∀ x ∈ s, -x ∈ s) (h_conv : Convex ℝ s) (h_cpt : IsCompact s)
     (h : μ F * 2 ^ finrank ℝ E ≤ μ s) :
-    ∃ (x : _) (_ : x ≠ 0), ((x : L) : E) ∈ s := by
+    ∃ x ≠ 0, ((x : L) : E) ∈ s := by
   have h_mes : μ s ≠ 0 := by
     intro hμ
     suffices μ F = 0 from fund.measure_ne_zero (NeZero.ne μ) this
