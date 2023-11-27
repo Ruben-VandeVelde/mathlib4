@@ -227,9 +227,9 @@ def import_only_check(lines, path):
 
 headers_comment_lines =  [
     (lambda x: x == "/-\n", ERR_COP),
-    (lambda x: re.match(r"Copyright \(c\) [0-9]{4} [^\.]+\. All rights reserved\.\n", x), ERR_COP),
+    (lambda x: re.match(r"Copyright \(c\) [0-9]{4} .*\. All rights reserved\.\n", x), ERR_COP),
     (lambda x: x == "Released under Apache 2.0 license as described in the file LICENSE.\n", ERR_COP),
-    (lambda x: x.startswith("Authors: ") and "  " not in x and " and " not in x and x[-2] == '.', ERR_AUT),
+    (lambda x: x.startswith("Authors: ") and "  " not in x and " and " not in x and x[-2] != '.', ERR_AUT),
     (lambda x: x == "-/\n", ERR_COP),
 ]
 
@@ -243,7 +243,6 @@ def check_header_comment(lines, path):
         errors += [(ERR_COP, 0, path)]
     else:
         for (line_nr, line), (expected, ty) in zip(lines, headers_comment_lines):
-            print([(line_nr, line), (expected, ty)])
             if not expected(line):
                 errors += [(ty, line_nr, path)]
 
