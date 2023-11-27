@@ -84,8 +84,6 @@ with SCRIPTS_DIR.joinpath("style-exceptions.txt").open(encoding="utf-8") as f:
         if ty is not None:
             exceptions += [(ty, path)]
 
-new_exceptions = False
-
 def annotate_comments(enumerate_lines):
     """
     Take a list of tuples of enumerated lines of the form
@@ -311,14 +309,16 @@ def output_message(path, line_nr, code, msg):
         print(f"::error file={path},line={line_nr},code={code}::{path}#L{line_nr}: {code}: {msg}")
 
 def format_errors(errors):
-    global new_exceptions
+    have_errors = False
     for errno, line_nr, path in errors:
         if (errno, path.resolve()) in exceptions:
             continue
-        new_exceptions = True
+        have_errors = True
         output_message(path, line_nr, *error_types[errno])
+    return have_errors
 
 def lint(path, fix=False):
+    have_errors = False
     with path.open(encoding="utf-8", newline="") as f:
         # We enumerate the lines so that we can report line numbers in the error messages correctly
         # we will modify lines as we go, so we need to keep track of the original line numbers
@@ -332,21 +332,23 @@ def lint(path, fix=False):
                             set_option_check,
                             banned_import_check]:
             errs, newlines = error_check(newlines, path)
-            format_errors(errs)
+            have_errors = format_errors(errs) or have_errors
 
         if not import_only_check(newlines, path):
             errs, newlines = regular_check(newlines, path)
-            format_errors(errs)
+            have_errors = format_errors(errs) or have_errors
     # if we haven't been asked to fix errors, or there are no errors or no fixes, we're done
-    if fix and new_exceptions and enum_lines != newlines:
+    if fix and have_errors and enum_lines != newlines:
         path.with_name(path.name + '.bak').write_text("".join(l for _,l in newlines), encoding = "utf8")
         shutil.move(path.with_name(path.name + '.bak'), path)
+    return have_errors
 
 fix = "--fix" in sys.argv
 argv = (arg for arg in sys.argv[1:] if arg != "--fix")
 
+have_errors = False
 for filename in argv:
-    lint(Path(filename), fix=fix)
+    have_errors = lint(Path(filename), fix=fix) or have_errors
 
-if new_exceptions:
+if have_errors:
     exit(1)
