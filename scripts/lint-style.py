@@ -70,13 +70,13 @@ error_types = [
 type_to_error = { ty: (s, desc) for ty, s, desc in error_types }
 type_string_to_type = { s: ty for ty, s, _ in error_types }
 
-exceptions = []
 
 SCRIPTS_DIR = Path(__file__).parent.resolve()
 ROOT_DIR = SCRIPTS_DIR.parent
 
 
 with SCRIPTS_DIR.joinpath("style-exceptions.txt").open(encoding="utf-8") as f:
+    exceptions = []
     for exline in f:
         filename, _, _, _, _, errno, *_ = exline.split()
         path = ROOT_DIR / filename
