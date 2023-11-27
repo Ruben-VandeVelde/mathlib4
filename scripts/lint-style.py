@@ -340,14 +340,13 @@ def lint(path, fix=False):
                             four_spaces_in_second_line,
                             long_lines_check,
                             isolated_by_dot_semicolon_check,
-                            set_option_check]:
+                            set_option_check,
+                            banned_import_check]:
             errs, newlines = error_check(newlines, path)
             format_errors(errs)
 
         if not import_only_check(newlines, path):
             errs, newlines = regular_check(newlines, path)
-            format_errors(errs)
-            errs, newlines = banned_import_check(newlines, path)
             format_errors(errs)
     # if we haven't been asked to fix errors, or there are no errors or no fixes, we're done
     if fix and new_exceptions and enum_lines != newlines:
