@@ -313,7 +313,7 @@ def format_errors(errors):
         if (errno, path.resolve()) in exceptions:
             continue
         have_errors = True
-        output_message(path, line_nr, *error_types[errno])
+        output_message(path, line_nr, *type_to_error[errno])
     return have_errors
 
 def lint(path, fix=False):
