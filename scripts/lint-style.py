@@ -313,13 +313,9 @@ def output_message(path, line_nr, code, msg):
         # filename first, then line so that we can call "sort" on the output
         print(f"{path} : line {line_nr} : {code} : {msg}")
     else:
-        if code.startswith("ERR"):
-            msg_type = "error"
-        if code.startswith("WRN"):
-            msg_type = "warning"
         # We are outputting for github. We duplicate path, line_nr and code,
         # so that they are also visible in the plaintext output.
-        print(f"::{msg_type} file={path},line={line_nr},code={code}::{path}#L{line_nr}: {code}: {msg}")
+        print(f"::error file={path},line={line_nr},code={code}::{path}#L{line_nr}: {code}: {msg}")
 
 def format_errors(errors):
     global new_exceptions
