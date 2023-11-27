@@ -233,33 +233,61 @@ headers_comment_lines =  [
     (lambda x: x == "-/\n", ERR_COP),
 ]
 
-def check_header_comment(lines, path):
+def regular_check(lines, path):
     if not isinstance(lines, list):
         raise TypeError("expected list")
 
-    errors = []
-
     if len(lines) < 5:
-        errors += [(ERR_COP, 0, path)]
-    else:
-        for (line_nr, line), (expected, ty) in zip(lines, headers_comment_lines):
-            if not expected(line):
-                errors += [(ty, line_nr, path)]
+        errors = [(ERR_COP, 0, path)]
+        return errors, lines
 
-    return errors, lines
+    newlines = []
+    errors = []
+    state = "copyright_open"
+    for line_nr, line in lines:
+        if state == "copyright_open":
+            if line == "\n":
+                errors += [(ERR_COP, line_nr, path)]
+                continue
 
-def regular_check(lines, path):
-    errors, lines = check_header_comment(lines, path)
-    for line_nr, line in lines[5:]:
-        if line == "\n":
-            continue
-        words = line.split()
-        if words[0] != "import" and words[0] != "--" and words[0] != "/-!" and words[0] != "#align_import":
-            errors += [(ERR_MOD, line_nr, path)]
-            break
-        if words[0] == "/-!":
-            break
-    return errors, lines
+            if line != "/-\n":
+                errors += [(ERR_COP, line_nr, path)]
+            state = "copyright_year"
+        elif state == "copyright_year":
+            if not re.match(r"Copyright \(c\) [0-9]{4} .+\. All rights reserved\.\n", line):
+                errors += [(ERR_COP, line_nr, path)]
+            state = "apache"
+        elif state == "apache":
+            if line != "Released under Apache 2.0 license as described in the file LICENSE.\n":
+                errors += [(ERR_COP, line_nr, path)]
+            state = "author_start"
+        elif state == "author_start":
+            if not line.startswith("Authors: "):
+                errors += [(ERR_AUT, line_nr, path)]
+            if "  " in line or " and " in line or line[-2] == '.':
+                errors += [(ERR_AUT, line_nr, path)]
+            state = "author_continue" if line[-2] == ',' else "copyright_close"
+        elif state == "author_continue":
+            if not line.startswith("  "):
+                errors += [(ERR_AUT, line_nr, path)]
+            if "  " in line[2:] or " and " in line or line[-2] == '.':
+                errors += [(ERR_AUT, line_nr, path)]
+            state = "author_continue" if line[-2] == ',' else "copyright_close"
+        elif state == "copyright_close":
+            if line != "-/\n":
+                errors += [(ERR_COP, line_nr, path)]
+            state = "imports"
+        elif state == "imports":
+            if line != "\n":
+                words = line.split()
+                if words[0] == "/-!":
+                    break
+                if words[0] != "import" and words[0] != "--" and words[0] != "#align_import":
+                    errors += [(ERR_MOD, line_nr, path)]
+        else:
+            assert False
+
+    return errors, newlines
 
 def banned_import_check(lines, path):
     errors = []
@@ -351,3 +379,115 @@ for filename in argv:
 
 if have_errors:
     exit(1)
+
+
+def check(s):
+    lines = [x + "\n" for x in s.splitlines()]
+    return regular_check(list(enumerate(lines, 1)), "")
+test = """
+/-
+Copyright (c) 2018 Johannes Hölzl. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Johannes Hölzl
+-/
+"""
+result = check(test)
+assert result[0] == [(ERR_COP, 1, "")]
+test = """\
+/-
+Copyright (c) 2018 Johannes Hölzl. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Johannes Hölzl
+-/
+"""
+result = check(test)
+assert result[0] == []
+test = """\
+/-
+Copyright (c) 2018 Johannes Hölzl. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Johannes Hölzl and Johan Commelin
+-/
+"""
+result = check(test)
+assert result[0] == [(ERR_AUT, 4, "")]
+test = """\
+/-
+Copyright (c) 2021 Yury G. Kudryashov. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yury G. Kudryashov
+-/
+"""
+result = check(test)
+assert result[0] == []
+test = """\
+/-
+Copyright (c) 2018 Chris Hughes. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Chris Hughes, Abhimanyu Pallavi Sudhir, Jean Lo, Calle Sönne, Sébastien Gouëzel,
+  Rémy Degenne, David Loeffler
+-/
+"""
+result = check(test)
+assert result[0] == []
+
+test = """\
+/-
+Copyright (c) 2018 Chris Hughes. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Chris Hughes, Abhimanyu Pallavi Sudhir, Jean Lo, Calle Sönne, Sébastien Gouëzel,
+  Rémy Degenne, David Loeffler
+-/
+import Mathlib
+"""
+result = check(test)
+assert result[0] == []
+
+test = """\
+/-
+Copyright (c) 2018 Chris Hughes. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Chris Hughes, Abhimanyu Pallavi Sudhir, Jean Lo, Calle Sönne, Sébastien Gouëzel,
+  Rémy Degenne, David Loeffler
+-/
+import Mathlib
+/-!
+"""
+result = check(test)
+assert result[0] == []
+
+test = """\
+/-
+Copyright (c) 2018 Chris Hughes. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Chris Hughes, Abhimanyu Pallavi Sudhir, Jean Lo, Calle Sönne, Sébastien Gouëzel,
+  Rémy Degenne, David Loeffler
+-/
+import Mathlib
+/- fail -/
+/-!
+"""
+result = check(test)
+assert result[0] != []
+
+test = """\
+/-
+Copyright (c) 2021 Scott Morrison All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Scott Morrison
+-/
+import Mathlib.LinearAlgebra.Quotient
+import Mathlib.Algebra.Category.ModuleCat.Basic
+
+#align_import algebra.category.Module.epi_mono from "leanprover-community/mathlib"@"70fd9563a21e7b963887c9360bd29b2393e6225a"
+
+/-!
+# Monomorphisms in `Module R`
+
+This file shows that an `R`-linear map is a monomorphism in the category of `R`-modules
+if and only if it is injective, and similarly an epimorphism if and only if it is surjective.
+-/
+
+"""
+result = check(test)
+assert result[0] == []
