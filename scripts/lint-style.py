@@ -227,41 +227,34 @@ def import_only_check(lines, path):
             return False
     return True
 
-def regular_check(lines, path):
+headers_comment_lines =  [
+    (lambda x: x == "/-\n", ERR_COP),
+    (lambda x: re.match(r"Copyright \(c\) [0-9]{4} [^\.]+\. All rights reserved\.\n", x), ERR_COP),
+    (lambda x: x == "Released under Apache 2.0 license as described in the file LICENSE.\n", ERR_COP),
+    (lambda x: x.startswith("Authors: ") and "  " not in x and " and " not in x and x[-2] == '.', ERR_AUT),
+    (lambda x: x == "-/\n", ERR_COP),
+]
+
+def check_header_comment(lines, path):
+    if not isinstance(lines, list):
+        raise TypeError("expected list")
+
     errors = []
-    copy_started = False
-    copy_done = False
-    copy_start_line_nr = 1
-    copy_lines = ""
-    for line_nr, line in lines:
-        if not copy_started and line == "\n":
-            errors += [(ERR_COP, copy_start_line_nr, path)]
-            continue
-        if not copy_started and line == "/-\n":
-            copy_started = True
-            copy_start_line_nr = line_nr
-            continue
-        if not copy_started:
-            errors += [(ERR_COP, line_nr, path)]
-        if copy_started and not copy_done:
-            copy_lines += line
-            if "Author" in line:
-                # Validating names is not a reasonable thing to do,
-                # so we just look for the two common variations:
-                # using ' and ' between names, and a '.' at the end of line.
-                if ((not line.startswith("Authors: ")) or
-                    ("  " in line) or
-                    (" and " in line) or
-                    (line[-2] == '.')):
-                    errors += [(ERR_AUT, line_nr, path)]
-            if line == "-/\n":
-                if ((not "Copyright" in copy_lines) or
-                    (not "Apache" in copy_lines) or
-                    (not "Authors: " in copy_lines)):
-                    errors += [(ERR_COP, copy_start_line_nr, path)]
-                copy_done = True
-            continue
-        if copy_done and line == "\n":
+
+    if len(lines) < 5:
+        errors += [(ERR_COP, 0, path)]
+    else:
+        for (line_nr, line), (expected, ty) in zip(lines, headers_comment_lines):
+            print([(line_nr, line), (expected, ty)])
+            if not expected(line):
+                errors += [(ty, line_nr, path)]
+
+    return errors, lines
+
+def regular_check(lines, path):
+    errors, lines = check_header_comment(lines, path)
+    for line_nr, line in lines[5:]:
+        if line == "\n":
             continue
         words = line.split()
         if words[0] != "import" and words[0] != "--" and words[0] != "/-!" and words[0] != "#align_import":
