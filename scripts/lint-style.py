@@ -68,6 +68,7 @@ error_types = [
 ]
 
 type_to_error = { ty: (s, desc) for ty, s, desc in error_types }
+type_string_to_type = { s: ty for ty, s, _ in error_types }
 
 exceptions = []
 
@@ -79,18 +80,9 @@ with SCRIPTS_DIR.joinpath("style-exceptions.txt").open(encoding="utf-8") as f:
     for exline in f:
         filename, _, _, _, _, errno, *_ = exline.split()
         path = ROOT_DIR / filename
-        if errno == "ERR_COP":
-            exceptions += [(ERR_COP, path)]
-        if errno == "ERR_MOD":
-            exceptions += [(ERR_MOD, path)]
-        if errno == "ERR_LIN":
-            exceptions += [(ERR_LIN, path)]
-        if errno == "ERR_OPT":
-            exceptions += [(ERR_OPT, path)]
-        if errno == "ERR_AUT":
-            exceptions += [(ERR_AUT, path)]
-        if errno == "ERR_TAC":
-            exceptions += [(ERR_TAC, path)]
+        ty = type_string_to_type.get(errno)
+        if ty is not None:
+            exceptions += [(ty, path)]
 
 new_exceptions = False
 
