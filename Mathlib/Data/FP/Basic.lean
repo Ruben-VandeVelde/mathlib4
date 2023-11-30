@@ -2,9 +2,15 @@
 Copyright (c) 2017 Mario Carneiro. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Mario Carneiro
--/
-import Mathlib.Data.Semiquot
-import Mathlib.Data.Rat.Floor
+-/import Mathlib.Data.Semiquot
+import Mathlib.Data.Nat.Size
+import Mathlib.Data.PNat.Defs
+import Mathlib.Data.Int.Order.Basic
+import Mathlib.Data.Nat.Cast.Order
+import Std.Data.Rat.Basic
+
+
+@[inherit_doc] notation "ℚ" => Rat
 
 #align_import data.fp.basic from "leanprover-community/mathlib"@"7b78d1776212a91ecc94cf601f83bdcc46b04213"
 
@@ -84,20 +90,28 @@ def toRat : ∀ f : Float, f.isFinite → ℚ
 #align fp.to_rat FP.toRat
 
 theorem Float.Zero.valid : ValidFinite emin 0 :=
-  ⟨by
+  ⟨(by
     rw [add_sub_assoc]
     apply le_add_of_nonneg_right
     apply sub_nonneg_of_le
     apply Int.ofNat_le_ofNat_of_le
-    exact C.precPos,
-    suffices prec ≤ 2 * emax by
-      rw [← Int.ofNat_le] at this
-      rw [← sub_nonneg] at *
-      simp only [emin, emax] at *
-      ring_nf
-      rw [mul_comm]
-      assumption
-    le_trans C.precMax (Nat.le_mul_of_pos_left (by decide)),
+    exact C.precPos),
+    (
+    by
+      -- have : prec ≤ 2 * emax := le_trans C.precMax (Nat.le_mul_of_pos_left (by decide))
+
+      suffices prec ≤ 2 * emax by
+        rw [← Int.ofNat_le] at this
+        rw [← sub_nonneg] at *
+        simp only [emin, emax] at *
+        convert this using 1
+        rw [@sub_sub_eq_add_sub]
+        rw [@sub_add_eq_sub_sub]
+        rw [@sub_sub_eq_add_sub]
+        rw [add_right_comm, ← two_mul]
+        rw [Int.add_sub_assoc]
+        rw [sub_self, add_zero, Nat.cast_mul, Nat.cast_ofNat]
+      exact le_trans C.precMax (Nat.le_mul_of_pos_left (by decide))),
     by (rw [max_eq_right]; simp [sub_eq_add_neg])⟩
 #align fp.float.zero.valid FP.Float.Zero.valid
 
@@ -288,3 +302,4 @@ unsafe def div (mode : RMode) : Float → Float → Float
 end Float
 
 end FP
+#minimize_imports
