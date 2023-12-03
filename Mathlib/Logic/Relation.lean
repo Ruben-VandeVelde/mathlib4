@@ -615,10 +615,10 @@ theorem reflTransGen_swap : ReflTransGen (swap r) a b ↔ ReflTransGen r b a :=
     · exact TransGen.mono (fun _ _ ↦ .single) h
 
 @[simp] lemma reflTransGen_reflGen : ReflTransGen (ReflGen r) = ReflTransGen r := by
-  simp only [←transGen_reflGen, reflGen_eq_self reflexive_reflGen]
+  simp only [← transGen_reflGen, reflGen_eq_self reflexive_reflGen]
 
 @[simp] lemma reflTransGen_transGen : ReflTransGen (TransGen r) = ReflTransGen r := by
-  simp only [←reflGen_transGen, transGen_idem]
+  simp only [← reflGen_transGen, transGen_idem]
 
 lemma reflTransGen_eq_transGen (hr : Reflexive r) :
     ReflTransGen r = TransGen r := by
@@ -686,7 +686,7 @@ theorem transitive_join (ht : Transitive r) (h : ∀ a b c, r a b → r a c → 
 #align relation.transitive_join Relation.transitive_join
 
 theorem equivalence_join (hr : Reflexive r) (ht : Transitive r)
-  (h : ∀ a b c, r a b → r a c → Join r b c) : Equivalence (Join r) :=
+    (h : ∀ a b c, r a b → r a c → Join r b c) : Equivalence (Join r) :=
   ⟨reflexive_join hr, @symmetric_join _ _, @transitive_join _ _ ht h⟩
 #align relation.equivalence_join Relation.equivalence_join
 

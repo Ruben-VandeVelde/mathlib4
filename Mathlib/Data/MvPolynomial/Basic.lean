@@ -247,7 +247,7 @@ theorem C_injective (σ : Type*) (R : Type*) [CommSemiring R] :
 theorem C_surjective {R : Type*} [CommSemiring R] (σ : Type*) [IsEmpty σ] :
     Function.Surjective (C : R → MvPolynomial σ R) := by
   refine' fun p => ⟨p.toFun 0, Finsupp.ext fun a => _⟩
-  simp only [C_apply, ←single_eq_monomial, (Finsupp.ext isEmptyElim (α := σ) : a = 0),
+  simp only [C_apply, ← single_eq_monomial, (Finsupp.ext isEmptyElim (α := σ) : a = 0),
     single_eq_same]
   rfl
 #align mv_polynomial.C_surjective MvPolynomial.C_surjective
@@ -336,8 +336,8 @@ theorem monomial_single_add : monomial (Finsupp.single n e + s) a = X n ^ e * mo
 #align mv_polynomial.monomial_single_add MvPolynomial.monomial_single_add
 
 theorem C_mul_X_pow_eq_monomial {s : σ} {a : R} {n : ℕ} :
-  C a * X s ^ n = monomial (Finsupp.single s n) a :=
-  by rw [← zero_add (Finsupp.single s n), monomial_add_single, C_apply]
+    C a * X s ^ n = monomial (Finsupp.single s n) a := by
+  rw [← zero_add (Finsupp.single s n), monomial_add_single, C_apply]
 #align mv_polynomial.C_mul_X_pow_eq_monomial MvPolynomial.C_mul_X_pow_eq_monomial
 
 theorem C_mul_X_eq_monomial {s : σ} {a : R} : C a * X s = monomial (Finsupp.single s 1) a := by
@@ -533,7 +533,7 @@ theorem finsupp_support_eq_support (p : MvPolynomial σ R) : Finsupp.support p =
 
 theorem support_monomial [h : Decidable (a = 0)] :
     (monomial s a).support = if a = 0 then ∅ else {s} := by
-  rw [←Subsingleton.elim (Classical.decEq R a 0) h]
+  rw [← Subsingleton.elim (Classical.decEq R a 0) h]
   rfl
   -- porting note: the proof in Lean 3 wasn't fundamentally better and needed `by convert rfl`
   -- the issue is the different decidability instances in the `ite` expressions
@@ -707,8 +707,8 @@ theorem coeff_C_mul (m) (a : R) (p : MvPolynomial σ R) : coeff m (C a * p) = a 
 #align mv_polynomial.coeff_C_mul MvPolynomial.coeff_C_mul
 
 theorem coeff_mul [DecidableEq σ] (p q : MvPolynomial σ R) (n : σ →₀ ℕ) :
-    coeff n (p * q) = ∑ x in antidiagonal n, coeff x.1 p * coeff x.2 q :=
-  AddMonoidAlgebra.mul_apply_antidiagonal p q _ _ mem_antidiagonal
+    coeff n (p * q) = ∑ x in Finset.antidiagonal n, coeff x.1 p * coeff x.2 q :=
+  AddMonoidAlgebra.mul_apply_antidiagonal p q _ _ Finset.mem_antidiagonal
 #align mv_polynomial.coeff_mul MvPolynomial.coeff_mul
 
 @[simp]
@@ -1453,8 +1453,7 @@ variable [Algebra R S₁] [CommSemiring S₂]
 
 variable (f : σ → S₁)
 
-theorem algebraMap_apply (r : R) :
-  algebraMap R (MvPolynomial σ S₁) r = C (algebraMap R S₁ r) := rfl
+theorem algebraMap_apply (r : R) : algebraMap R (MvPolynomial σ S₁) r = C (algebraMap R S₁ r) := rfl
 #align mv_polynomial.algebra_map_apply MvPolynomial.algebraMap_apply
 
 /-- A map `σ → S₁` where `S₁` is an algebra over `R` generates an `R`-algebra homomorphism
@@ -1703,7 +1702,7 @@ theorem eval₂_mem {f : R →+* S} {p : MvPolynomial σ R} {s : subS}
     · subst h
       rw [MvPolynomial.not_mem_support_iff.1 ha, map_zero]
       exact zero_mem _
-    · rwa [if_neg h, zero_add] at this
+    · rwa [zero_add] at this
 #align mv_polynomial.eval₂_mem MvPolynomial.eval₂_mem
 
 theorem eval_mem {p : MvPolynomial σ S} {s : subS} (hs : ∀ i ∈ p.support, p.coeff i ∈ s) {v : σ → S}
