@@ -199,12 +199,52 @@ def iUnion (s : ι → Set α) : Set α :=
 def iInter (s : ι → Set α) : Set α :=
   iInf s
 #align set.Inter Set.iInter
+variable {s : Nat → Nat → Set Nat} {t : Set Nat}
+
+-- #check ∃ᵉ x ∈ {(1 : ℕ)}, True
+-- #check ∃ x ∈ {(1 : ℕ)}, True
+-- #check ∃ x y, True
+-- #check ∃ᵉ (x ∈ t) (y ∈ t), True
+-- notation3 "⋃ "(...)", "r:60:(scoped f => iUnion f) => r
+-- #check (⋃ i j, s i j) ⊆ t
+-- #check (⋃ (i) (j), s i j) ⊆ t
+-- example : (⋃ i ∈ t, ⋃ j ∈ t, s i j) ⊆ t := sorry
+-- syntax "∃ᵉ" extBinders ", " term : term
+
+section
+
+open Lean TSyntax.Compat Std.ExtendedBinder
 
 /-- Notation for `Set.iUnion`. Indexed union of a family of sets -/
-notation3 "⋃ "(...)", "r:60:(scoped f => iUnion f) => r
+macro "⋃" xs:explicitBinders ", " b:term : term => expandExplicitBinders ``Set.iUnion xs b
+
+-- macro_rules
+--   | `({ $x:ident | $p }) => `(setOf fun $x:ident ↦ $p)
+--   | `({ $x:ident : $t | $p }) => `(setOf fun $x:ident : $t ↦ $p)
+--   | `({ $x:ident $b:binderPred | $p }) =>
+--     `(setOf fun $x:ident ↦ satisfies_binder_pred% $x $b ∧ $p)
+
+
+#check (⋃ i, ⋃ j, s i j) ⊆ t
+#check (⋃ i j, s i j) ⊆ t
+-- example : (⋃ i ∈ t, ⋃ j ∈ t, s i j) ⊆ t := sorry
+-- example : (⋃ (i ∈ t) (j ∈ t), s i j) ⊆ t := sorry
+
+syntax "⋃" extBinders ", " term : term
+macro_rules
+  | `(⋃, $b) => pure b
+  | `(⋃ ($p:extBinder) $[($ps:extBinder)]*, $b) =>
+    `(⋃ $p:extBinder, ⋃ $[($ps:extBinder)]*, $b)
+
+example : (⋃ i, ⋃ j, s i j) ⊆ t := sorry
+example : (⋃ i j, s i j) ⊆ t := sorry
+example : (⋃ i ∈ t, ⋃ j ∈ t, s i j) ⊆ t := sorry
+example : (⋃ (i ∈ t) (j ∈ t), s i j) ⊆ t := sorry
 
 /-- Notation for `Set.iInter`. Indexed intersection of a family of sets -/
-notation3 "⋂ "(...)", "r:60:(scoped f => iInter f) => r
+macro "⋂" xs:explicitBinders ", " b:term : term => expandExplicitBinders ``Set.iInter xs b
+
+end
 
 section delaborators
 
@@ -299,4 +339,3 @@ theorem iSup_eq_iUnion (s : ι → Set α) : iSup s = iUnion s :=
 theorem iInf_eq_iInter (s : ι → Set α) : iInf s = iInter s :=
   rfl
 #align set.infi_eq_Inter Set.iInf_eq_iInter
-
