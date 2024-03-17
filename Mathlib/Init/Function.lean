@@ -30,6 +30,11 @@ lemma flip_def {f : α → β → φ} : flip f = fun b a => f a b := rfl
 
 attribute [eqns flip_def] flip
 
+theorem Rel.extracted_1 {α : Type _} {β : Type _} :
+    (flip fun (x : α) (x : β) ↦ True) = fun x x ↦ True := by
+  simp [flip]
+
+
 /-- Composition of dependent functions: `(f ∘' g) x = f (g x)`, where type of `g x` depends on `x`
 and type of `f (g x)` depends on `x` and `g x`. -/
 @[inline, reducible]

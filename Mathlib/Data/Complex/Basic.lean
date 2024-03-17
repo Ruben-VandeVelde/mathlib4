@@ -526,7 +526,7 @@ end
 
 /-! ### Complex conjugation -/
 
-
+#check flip
 /-- This defines the complex conjugate as the `star` operation of the `StarRing ℂ`. It
 is recommended to use the ring endomorphism version `starRingEnd`, available under the
 notation `conj` in the locale `ComplexConjugate`. -/

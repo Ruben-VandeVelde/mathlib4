@@ -3,9 +3,25 @@ Copyright (c) 2018 Jeremy Avigad. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jeremy Avigad
 -/
-import Mathlib.Order.CompleteLattice
-import Mathlib.Order.GaloisConnection
-import Mathlib.Data.Set.Lattice
+-- import Mathlib.Order.CompleteLattice
+-- import Mathlib.Order.GaloisConnection
+import Mathlib.Init.Function
+
+import Mathlib.Tactic.Eqns
+
+namespace Function
+universe u₁ u₂ u₃ u₄ u₅
+
+-- Porting note: fix the universe of `ζ`, it used to be `u₁`
+variable {α : Sort u₁} {β : Sort u₂} {φ : Sort u₃} {δ : Sort u₄} {ζ : Sort u₅}
+
+-- theorem flip_def' {f : α → β → φ} : flip f = fun b a => f a b := rfl
+-- attribute [eqns flip_def'] flip
+end Function
+
+theorem Rel.extracted_1 {α : Type _} {β : Type _} :
+    (flip fun (x : α) (x : β) ↦ True) = fun x x ↦ True := by
+  simp [flip]
 
 #align_import data.rel from "leanprover-community/mathlib"@"706d88f2b8fdfeb0b22796433d7a6c1a010af9f2"
 
@@ -154,10 +170,16 @@ theorem inv_bot : (⊥ : Rel α β).inv = (⊥ : Rel β α) := by
   unfold flip
   simp
 
+theorem Rel.extracted_1 {α : Type u_1} {β : Type u_2} :
+    (flip fun (x : α) (x : β) ↦ True) = fun x x ↦ True := by
+  simp [flip]
+
+
 @[simp]
 theorem inv_top : (⊤ : Rel α β).inv = (⊤ : Rel β α) := by
   -- FIXME nightly-testing: Why does simp no longer unfold flip?
   simp [Top.top, inv, flip]
+  extract_goal
   unfold flip
   simp
 
