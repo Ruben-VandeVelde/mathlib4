@@ -20,6 +20,8 @@ open Complex Finset Polynomial
 
 variable {ι : Type*} [Fintype ι]
 
+theorem norm_eq_abs' (n : ℤ) : ‖n‖ = |(n : ℝ)| := sorry
+
 theorem linear_independent_exp (u : ι → ℂ) (hu : ∀ i, IsIntegral ℚ (u i))
     (u_inj : Function.Injective u) (v : ι → ℂ) (hv : ∀ i, IsIntegral ℚ (v i))
     (h : ∑ i, v i * exp (u i) = 0) : v = 0 := by
@@ -190,21 +192,10 @@ theorem linear_independent_exp (u : ι → ℂ) (hu : ∀ i, IsIntegral ℚ (u i
         rw [mem_roots_map_of_injective (algebraMap ℤ ℂ).injective_int P0', ← aeval_def]
         rw [map_prod]
         exact prod_eq_zero (mem_univ j) hx
-  -- simp_rw [Int.norm_eq_abs, Int.cast_pow, _root_.abs_pow, ← Int.norm_eq_abs, Multiset.map_const,
-  --   Multiset.sum_replicate, ← mul_sum, ← sum_smul, nsmul_eq_mul, mul_comm (‖k‖ ^ t), mul_assoc,
-  --   mul_comm (_ / _ : ℝ), t, pow_mul, mul_div (_ ^ _ : ℝ), ← mul_pow, ← mul_assoc, mul_div, ←
-  --   pow_mul] at H
-  rw [Int.norm_eq_abs, _root_.abs_pow, Int.cast_pow, ← Int.norm_eq_abs] at H
-  conv_rhs at H =>
-    congr
-    · skip
-    · congr
-      · skip
-      · ext
-        rw [Multiset.map_const', Multiset.sum_replicate]
-  conv_rhs at H =>
-    rw [← mul_sum, mul_left_comm, ← sum_smul, nsmul_eq_mul, mul_comm (‖k‖ ^ t), mul_assoc,
-      mul_comm (_ / _ : ℝ), pow_mul, mul_div (_ ^ _ : ℝ), ← mul_pow, ← mul_assoc, mul_div]
+  simp_rw [norm_eq_abs', Int.cast_pow, _root_.abs_pow, ← norm_eq_abs', Multiset.map_const',
+    Multiset.sum_replicate, ← mul_sum, ← sum_smul, nsmul_eq_mul, mul_comm (‖k‖ ^ t), mul_assoc,
+    mul_comm (_ / _ : ℝ), t, pow_mul, mul_div (_ ^ _ : ℝ), ← mul_pow, ← mul_assoc, mul_div, ←
+    pow_mul] at H
   replace H := H.trans_lt hq
   have : ∑ j, w' j • (((p j).aroots K).map fun x : K => k ^ (P.natDegree * q) • aeval x gp).sum =
       algebraMap ℤ K (∑ j, w' j • sz j) := by
@@ -215,7 +206,7 @@ theorem linear_independent_exp (u : ι → ℂ) (hu : ∀ i, IsIntegral ℚ (u i
       ‖algebraMap ℤ ℂ (k ^ (P.natDegree * q) * n * w + q * ∑ j, w' j • sz j)‖ := by
     simp_rw [IsScalarTower.algebraMap_apply ℤ K ℂ, algebraMap_int_eq, Int.coe_castRingHom]
     norm_cast
-  rw [nsmul_eq_mul, this, algebraMap_int_eq, Int.coe_castRingHom, norm_int, ← Int.cast_abs,
+  rw [this, algebraMap_int_eq, Int.coe_castRingHom, norm_int, ← Int.cast_abs,
     ← Int.cast_one, Int.cast_lt, Int.abs_lt_one_iff] at H
   replace H : (k ^ (P.natDegree * q) * n * w + q * ∑ j : Fin m, w' j • sz j) % q = 0 := by
     rw [H, Int.zero_emod]
