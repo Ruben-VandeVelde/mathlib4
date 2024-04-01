@@ -417,6 +417,7 @@ instance : Algebra F (GalConjClasses ℚ (K s) →₀ F) :=
 theorem one_eq_single : (1 : GalConjClasses ℚ (K s) →₀ F) = Finsupp.single 0 1 := by
   change toConjEquiv s F 1 = _
   ext i; rw [toConjEquiv_apply_apply]
+
   change (1 : AddMonoidAlgebra F (K s)) i.out = Finsupp.single 0 1 i
   simp_rw [AddMonoidAlgebra.one_def, Finsupp.single_apply]
   change (ite (0 = i.out) 1 0 : F) = ite (0 = i) 1 0
@@ -522,22 +523,21 @@ theorem Eval_ratCoeff (x : ratCoeff s) : Eval s (K s) x = Eval s ℚ (ratCoeffEq
   congr 2
   simp_rw [IsScalarTower.algebraMap_apply ℚ (⊥ : IntermediateField ℚ (K s)) (K s),
     ← IntermediateField.botEquiv_symm]
-  rw [AlgEquiv.symm_apply_apply]
-  rfl
+  rw [AlgEquiv.symm_apply_apply, IntermediateField.algebraMap_apply]
 #align Eval_rat_coeff Eval_ratCoeff
 
 theorem Eval_toConjAlgEquiv_symm (x : GalConjClasses ℚ (K s) →₀ ℚ) :
     Eval s ℚ ((toConjAlgEquiv s ℚ).symm x) =
       ∑ c : GalConjClasses ℚ (K s) in x.support,
         x c • ∑ i : K s in c.orbit.toFinset, exp (algebraMap (K s) ℂ i) := by
-  conv_lhs => rw [← x.sum_single, Finsupp.sum, map_sum]
+  conv_lhs => rw [← x.sum_single, map_finsupp_sum]
   simp_rw [toConjAlgEquiv_symm_apply, toConjLinearEquiv_symm_apply]
   have :
     ∀ (s' : Finset (K s)) (b : ℚ),
       ((Finsupp.indicator s' fun _ _ => b).sum fun a c => c • exp (algebraMap (K s) ℂ a)) =
         ∑ i in s', b • exp (algebraMap (K s) ℂ i) :=
     fun s' b => Finsupp.sum_indicator_index _ fun i _ => by rw [zero_smul]
-  simp_rw [toConjEquiv_symm_single, AddSubmonoidClass.coe_finset_sum, map_sum,
+  simp_rw [toConjEquiv_symm_single, AddMonoidHom.coe_finsupp_sum, map_sum,
     Eval_apply, this, smul_sum]
 #align Eval_to_conj_alg_equiv_symm Eval_toConjAlgEquiv_symm
 
