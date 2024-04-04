@@ -8,7 +8,7 @@ import Std.WF
 import Mathlib.Init.Data.Nat.Lemmas
 import Mathlib.Logic.Function.Basic
 import Mathlib.Logic.Nontrivial.Defs
-import Mathlib.Tactic.Cases
+-- import Mathlib.Tactic.Cases
 import Mathlib.Tactic.GCongr.Core
 import Mathlib.Tactic.PushNeg
 -- import Mathlib.Tactic.Use
@@ -843,25 +843,29 @@ theorem leRecOn_succ_left {C : Nat → Sort _} {n m} (h1 : n ≤ m) (h2 : n + 1 
 
 theorem leRecOn_injective {C : Nat → Sort _} {n m} (hnm : n ≤ m) (next : ∀ {k}, C k → C (k + 1))
     (Hnext : ∀ n, Injective (@next n)) : Injective (@leRecOn C n m hnm next) := by
-  induction' hnm with m hnm ih
-  · intro x y H
+  induction hnm with
+  | refl =>
+    intro x y H
     rwa [leRecOn_self, leRecOn_self] at H
-  intro x y H
-  rw [leRecOn_succ hnm, leRecOn_succ hnm] at H
-  exact ih (Hnext _ H)
+  | step hnm ih =>
+    intro x y H
+    rw [leRecOn_succ hnm, leRecOn_succ hnm] at H
+    exact ih (Hnext _ H)
 #align nat.le_rec_on_injective Nat.leRecOn_injective
 
 theorem leRecOn_surjective {C : Nat → Sort _} {n m} (hnm : n ≤ m) (next : ∀ {k}, C k → C (k + 1))
     (Hnext : ∀ n, Surjective (@next n)) : Surjective (@leRecOn C n m hnm next) := by
-  induction' hnm with m hnm ih
-  · intro x
+  induction hnm with
+  | refl =>
+    intro x
     refine ⟨x, ?_⟩
     rw [leRecOn_self]
-  intro x
-  obtain ⟨w, rfl⟩ := Hnext _ x
-  obtain ⟨x, rfl⟩ := ih w
-  refine ⟨x, ?_⟩
-  rw [leRecOn_succ]
+  | step hnm ih =>
+    intro x
+    obtain ⟨w, rfl⟩ := Hnext _ x
+    obtain ⟨x, rfl⟩ := ih w
+    refine ⟨x, ?_⟩
+    rw [leRecOn_succ]
 #align nat.le_rec_on_surjective Nat.leRecOn_surjective
 
 /-- Recursion principle based on `<`. -/
