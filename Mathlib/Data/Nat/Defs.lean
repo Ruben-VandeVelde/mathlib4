@@ -84,7 +84,7 @@ lemma succ_succ_ne_one (n : ℕ) : n.succ.succ ≠ 1 := by simp
 alias _root_.LT.lt.nat_succ_le := succ_le_of_lt
 #align has_lt.lt.nat_succ_le LT.lt.nat_succ_le
 
-lemma not_succ_lt_self : ¬ succ n < n := not_lt_of_ge n.le_succ
+lemma not_succ_lt_self : ¬ succ n < n := Nat.not_lt_of_ge n.le_succ
 #align nat.not_succ_lt_self Nat.not_succ_lt_self
 
 #align nat.lt_succ_iff Nat.lt_succ_iff
@@ -93,10 +93,10 @@ lemma succ_le_iff : succ m ≤ n ↔ m < n := ⟨lt_of_succ_le, succ_le_of_lt⟩
 #align nat.succ_le_iff Nat.succ_le_iff
 
 lemma le_succ_iff : m ≤ n.succ ↔ m ≤ n ∨ m = n.succ := by
-  refine ⟨fun hmn ↦ (lt_or_eq_of_le hmn).imp_left le_of_lt_succ, ?_⟩
+  refine ⟨fun hmn ↦ (Nat.lt_or_eq_of_le hmn).imp_left le_of_lt_succ, ?_⟩
   rintro (hmn | rfl)
   · exact le_succ_of_le hmn
-  · rfl
+  · apply Nat.le_refl
 
 alias ⟨of_le_succ, _⟩ := le_succ_iff
 #align nat.of_le_succ Nat.of_le_succ
@@ -146,7 +146,7 @@ lemma le_one_iff_eq_zero_or_eq_one : ∀ {n : ℕ}, n ≤ 1 ↔ n = 0 ∨ n = 1 
 @[simp] lemma lt_one_iff : n < 1 ↔ n = 0 := Nat.lt_succ_iff.trans $ by rw [le_zero_eq]
 #align nat.lt_one_iff Nat.lt_one_iff
 
-lemma one_le_of_lt (h : a < b) : 1 ≤ b := lt_of_le_of_lt (Nat.zero_le _) h
+lemma one_le_of_lt (h : a < b) : 1 ≤ b := Nat.lt_of_le_of_lt (Nat.zero_le _) h
 #align nat.one_le_of_lt Nat.one_le_of_lt
 
 @[simp] lemma min_eq_zero_iff : min m n = 0 ↔ m = 0 ∨ n = 0 := by omega
@@ -291,11 +291,11 @@ lemma add_eq_three_iff :
 #align nat.add_eq_three_iff Nat.add_eq_three_iff
 
 lemma le_add_one_iff : m ≤ n + 1 ↔ m ≤ n ∨ m = n + 1 := by
-  rw [le_iff_lt_or_eq, lt_add_one_iff]
+  rw [Nat.le_iff_lt_or_eq, lt_add_one_iff]
 #align nat.le_add_one_iff Nat.le_add_one_iff
 
 lemma le_and_le_add_one_iff : n ≤ m ∧ m ≤ n + 1 ↔ m = n ∨ m = n + 1 := by
-  rw [le_add_one_iff, and_or_left, ← le_antisymm_iff, eq_comm, and_iff_right_of_imp]
+  rw [le_add_one_iff, and_or_left, ← Nat.le_antisymm_iff, eq_comm, and_iff_right_of_imp]
   rintro rfl
   exact n.le_succ
 #align nat.le_and_le_add_one_iff Nat.le_and_le_add_one_iff
@@ -352,7 +352,7 @@ protected lemma zero_eq_mul : 0 = m * n ↔ m = 0 ∨ n = 0 := by rw [eq_comm, N
 #align nat.zero_eq_mul Nat.zero_eq_mul
 
 lemma two_mul_ne_two_mul_add_one : 2 * n ≠ 2 * m + 1 :=
-  mt (congr_arg (· % 2))
+  mt (congrArg (· % 2))
     (by rw [Nat.add_comm, add_mul_mod_self_left, mul_mod_right, mod_eq_of_lt] <;> simp)
 #align nat.two_mul_ne_two_mul_add_one Nat.two_mul_ne_two_mul_add_one
 
@@ -364,10 +364,10 @@ protected lemma mul_left_inj (ha : a ≠ 0) : b * a = c * a ↔ b = c :=
 protected lemma mul_right_inj (ha : a ≠ 0) : a * b = a * c ↔ b = c :=
   Nat.mul_left_cancel_iff (Nat.pos_iff_ne_zero.2 ha) _ _
 
-protected lemma mul_ne_mul_left (ha : a ≠ 0) : b * a ≠ c * a ↔ b ≠ c := (Nat.mul_left_inj ha).not
+protected lemma mul_ne_mul_left (ha : a ≠ 0) : b * a ≠ c * a ↔ b ≠ c := not_congr (Nat.mul_left_inj ha)
 #align nat.mul_ne_mul_left Nat.mul_ne_mul_left
 
-protected lemma mul_ne_mul_right (ha : a ≠ 0) : a * b ≠ a * c ↔ b ≠ c := (Nat.mul_right_inj ha).not
+protected lemma mul_ne_mul_right (ha : a ≠ 0) : a * b ≠ a * c ↔ b ≠ c := not_congr (Nat.mul_right_inj ha)
 #align nat.mul_ne_mul_right Nat.mul_ne_mul_right
 
 lemma mul_eq_left (ha : a ≠ 0) : a * b = a ↔ b = 1 := by simpa using Nat.mul_right_inj ha (c := 1)
@@ -414,7 +414,7 @@ lemma eq_zero_of_double_le (h : 2 * n ≤ n) : n = 0 := by omega
 #align nat.eq_zero_of_double_le Nat.eq_zero_of_double_le
 
 lemma eq_zero_of_mul_le (hb : 2 ≤ n) (h : n * m ≤ m) : m = 0 :=
-  eq_zero_of_double_le <| le_trans (Nat.mul_le_mul_right _ hb) h
+  eq_zero_of_double_le <| Nat.le_trans (Nat.mul_le_mul_right _ hb) h
 #align nat.eq_zero_of_mul_le Nat.eq_zero_of_mul_le
 
 lemma succ_mul_pos (m : ℕ) (hn : 0 < n) : 0 < succ m * n := Nat.mul_pos m.succ_pos hn
@@ -424,25 +424,25 @@ lemma mul_self_le_mul_self (h : m ≤ n) : m * m ≤ n * n := Nat.mul_le_mul h h
 #align nat.mul_self_le_mul_self Nat.mul_self_le_mul_self
 
 lemma mul_lt_mul'' (hac : a < c) (hbd : b < d) : a * b < c * d :=
-  Nat.mul_lt_mul_of_lt_of_le hac (le_of_lt hbd) $ by omega
+  Nat.mul_lt_mul_of_lt_of_le hac (Nat.le_of_lt hbd) $ by omega
 
 lemma mul_self_lt_mul_self (h : m < n) : m * m < n * n := mul_lt_mul'' h h
 #align nat.mul_self_lt_mul_self Nat.mul_self_lt_mul_self
 
 lemma mul_self_le_mul_self_iff : m * m ≤ n * n ↔ m ≤ n :=
-  ⟨le_imp_le_of_lt_imp_lt mul_self_lt_mul_self, mul_self_le_mul_self⟩
+  ⟨fun h => Nat.le_of_not_lt fun h' => Nat.not_le_of_gt (mul_self_lt_mul_self h') h, mul_self_le_mul_self⟩
 #align nat.mul_self_le_mul_self_iff Nat.mul_self_le_mul_self_iff
 
 lemma mul_self_lt_mul_self_iff : m * m < n * n ↔ m < n := by
-  simp only [← not_le, mul_self_le_mul_self_iff]
+  simp only [← Nat.not_le, mul_self_le_mul_self_iff]
 #align nat.mul_self_lt_mul_self_iff Nat.mul_self_lt_mul_self_iff
 
 lemma le_mul_self : ∀ n : ℕ, n ≤ n * n
-  | 0 => le_refl _
+  | 0 => Nat.le_refl _
   | n + 1 => by simp [Nat.mul_add]
 #align nat.le_mul_self Nat.le_mul_self
 
-lemma mul_self_inj : m * m = n * n ↔ m = n := by simp [le_antisymm_iff, mul_self_le_mul_self_iff]
+lemma mul_self_inj : m * m = n * n ↔ m = n := by simp [Nat.le_antisymm_iff, mul_self_le_mul_self_iff]
 #align nat.mul_self_inj Nat.mul_self_inj
 
 @[simp] lemma lt_mul_self_iff : ∀ {n : ℕ}, n < n * n ↔ 1 < n
