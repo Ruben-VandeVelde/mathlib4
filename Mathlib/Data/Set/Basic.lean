@@ -658,8 +658,9 @@ theorem subset_univ (s : Set α) : s ⊆ univ := fun _ _ => trivial
 #align set.subset_univ Set.subset_univ
 
 @[simp]
-theorem univ_subset_iff {s : Set α} : univ ⊆ s ↔ s = univ :=
-  @top_le_iff _ _ _ s
+theorem univ_subset_iff {s : Set α} : univ ⊆ s ↔ s = univ := by
+  rw [Subset.antisymm_iff]
+  simp
 #align set.univ_subset_iff Set.univ_subset_iff
 
 alias ⟨eq_univ_of_univ_subset, _⟩ := univ_subset_iff
@@ -1465,7 +1466,8 @@ theorem subset_singleton_iff {α : Type*} {s : Set α} {x : α} : s ⊆ {x} ↔ 
 theorem subset_singleton_iff_eq {s : Set α} {x : α} : s ⊆ {x} ↔ s = ∅ ∨ s = {x} := by
   obtain rfl | hs := s.eq_empty_or_nonempty
   · exact ⟨fun _ => Or.inl rfl, fun _ => empty_subset _⟩
-  · simp [eq_singleton_iff_nonempty_unique_mem, hs, hs.ne_empty]
+  · simp only [subset_singleton_iff, hs.ne_empty, eq_singleton_iff_nonempty_unique_mem, hs,
+      true_and, false_or]
 #align set.subset_singleton_iff_eq Set.subset_singleton_iff_eq
 
 theorem Nonempty.subset_singleton_iff (h : s.Nonempty) : s ⊆ {a} ↔ s = {a} :=
