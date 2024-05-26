@@ -73,19 +73,19 @@ namespace Set
 
 variable {α : Type u} {s t : Set α}
 
+instance : HasSSubset (Set α) :=
+  ⟨fun s t => s ⊆ t ∧ ¬t ⊆ s⟩
+
 instance instBooleanAlgebraSet : BooleanAlgebra (Set α) :=
   { (inferInstance : BooleanAlgebra (α → Prop)) with
     sup := (· ∪ ·),
     le := (· ≤ ·),
-    lt := fun s t => s ⊆ t ∧ ¬t ⊆ s,
+    lt := (· ⊂ ·),
     inf := (· ∩ ·),
     bot := ∅,
     compl := (·ᶜ),
     top := univ,
     sdiff := (· \ ·) }
-
-instance : HasSSubset (Set α) :=
-  ⟨(· < ·)⟩
 
 @[simp]
 theorem top_eq_univ : (⊤ : Set α) = univ :=
@@ -699,7 +699,7 @@ theorem univ_unique [Unique α] : @Set.univ α = {default} :=
 #align set.univ_unique Set.univ_unique
 
 theorem ssubset_univ_iff : s ⊂ univ ↔ s ≠ univ :=
-  lt_top_iff_ne_top
+  lt_top_iff_ne_top (a := s)
 #align set.ssubset_univ_iff Set.ssubset_univ_iff
 
 instance nontrivial_of_nonempty [Nonempty α] : Nontrivial (Set α) :=
@@ -2035,7 +2035,7 @@ theorem diff_singleton_eq_self {a : α} {s : Set α} (h : a ∉ s) : s \ {a} = s
 
 @[simp]
 theorem diff_singleton_sSubset {s : Set α} {a : α} : s \ {a} ⊂ s ↔ a ∈ s :=
-  sdiff_le.lt_iff_ne.trans <| sdiff_eq_left.not.trans <| by simp
+  sdiff_le (a := s).lt_iff_ne.trans <| sdiff_eq_left.not.trans <| by simp
 #align set.diff_singleton_ssubset Set.diff_singleton_sSubset
 
 @[simp]
