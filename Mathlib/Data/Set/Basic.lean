@@ -76,60 +76,60 @@ variable {α : Type u} {s t : Set α}
 instance : HasSSubset (Set α) :=
   ⟨fun s t => s ⊆ t ∧ ¬t ⊆ s⟩
 
-instance instBooleanAlgebraSet : BooleanAlgebra (Set α) :=
-  { (inferInstance : BooleanAlgebra (α → Prop)) with
-    sup := (· ∪ ·),
-    le := (· ≤ ·),
-    lt := (· ⊂ ·),
-    inf := (· ∩ ·),
-    bot := ∅,
-    compl := (·ᶜ),
-    top := univ,
-    sdiff := (· \ ·) }
+-- instance instBooleanAlgebraSet : BooleanAlgebra (Set α) :=
+--   { (inferInstance : BooleanAlgebra (α → Prop)) with
+--     sup := (· ∪ ·),
+--     le := (· ≤ ·),
+--     lt := (· ⊂ ·),
+--     inf := (· ∩ ·),
+--     bot := ∅,
+--     compl := (·ᶜ),
+--     top := univ,
+--     sdiff := (· \ ·) }
 
-@[simp]
-theorem top_eq_univ : (⊤ : Set α) = univ :=
-  rfl
-#align set.top_eq_univ Set.top_eq_univ
+-- @[simp]
+-- theorem top_eq_univ : (⊤ : Set α) = univ :=
+--   rfl
+-- #align set.top_eq_univ Set.top_eq_univ
 
-@[simp]
-theorem bot_eq_empty : (⊥ : Set α) = ∅ :=
-  rfl
-#align set.bot_eq_empty Set.bot_eq_empty
+-- @[simp]
+-- theorem bot_eq_empty : (⊥ : Set α) = ∅ :=
+--   rfl
+-- #align set.bot_eq_empty Set.bot_eq_empty
 
-@[simp]
-theorem sup_eq_union : ((· ⊔ ·) : Set α → Set α → Set α) = (· ∪ ·) :=
-  rfl
-#align set.sup_eq_union Set.sup_eq_union
+-- @[simp]
+-- theorem sup_eq_union : ((· ⊔ ·) : Set α → Set α → Set α) = (· ∪ ·) :=
+--   rfl
+-- #align set.sup_eq_union Set.sup_eq_union
 
-@[simp]
-theorem inf_eq_inter : ((· ⊓ ·) : Set α → Set α → Set α) = (· ∩ ·) :=
-  rfl
-#align set.inf_eq_inter Set.inf_eq_inter
+-- @[simp]
+-- theorem inf_eq_inter : ((· ⊓ ·) : Set α → Set α → Set α) = (· ∩ ·) :=
+--   rfl
+-- #align set.inf_eq_inter Set.inf_eq_inter
 
-@[simp]
-theorem le_eq_subset : ((· ≤ ·) : Set α → Set α → Prop) = (· ⊆ ·) :=
-  rfl
-#align set.le_eq_subset Set.le_eq_subset
+-- @[simp]
+-- theorem le_eq_subset : ((· ≤ ·) : Set α → Set α → Prop) = (· ⊆ ·) :=
+--   rfl
+-- #align set.le_eq_subset Set.le_eq_subset
 
-@[simp]
-theorem lt_eq_ssubset : ((· < ·) : Set α → Set α → Prop) = (· ⊂ ·) :=
-  rfl
-#align set.lt_eq_ssubset Set.lt_eq_ssubset
+-- @[simp]
+-- theorem lt_eq_ssubset : ((· < ·) : Set α → Set α → Prop) = (· ⊂ ·) :=
+--   rfl
+-- #align set.lt_eq_ssubset Set.lt_eq_ssubset
 
-theorem le_iff_subset : s ≤ t ↔ s ⊆ t :=
-  Iff.rfl
-#align set.le_iff_subset Set.le_iff_subset
+-- theorem le_iff_subset : s ≤ t ↔ s ⊆ t :=
+--   Iff.rfl
+-- #align set.le_iff_subset Set.le_iff_subset
 
-theorem lt_iff_ssubset : s < t ↔ s ⊂ t :=
-  Iff.rfl
-#align set.lt_iff_ssubset Set.lt_iff_ssubset
+-- theorem lt_iff_ssubset : s < t ↔ s ⊂ t :=
+--   Iff.rfl
+-- #align set.lt_iff_ssubset Set.lt_iff_ssubset
 
-alias ⟨_root_.LE.le.subset, _root_.HasSubset.Subset.le⟩ := le_iff_subset
-#align has_subset.subset.le HasSubset.Subset.le
+-- alias ⟨_root_.LE.le.subset, _root_.HasSubset.Subset.le⟩ := le_iff_subset
+-- #align has_subset.subset.le HasSubset.Subset.le
 
-alias ⟨_root_.LT.lt.ssubset, _root_.HasSSubset.SSubset.lt⟩ := lt_iff_ssubset
-#align has_ssubset.ssubset.lt HasSSubset.SSubset.lt
+-- alias ⟨_root_.LT.lt.ssubset, _root_.HasSSubset.SSubset.lt⟩ := lt_iff_ssubset
+-- #align has_ssubset.ssubset.lt HasSSubset.SSubset.lt
 
 instance PiSetCoe.canLift (ι : Type u) (α : ι → Type v) [∀ i, Nonempty (α i)] (s : Set ι) :
     CanLift (∀ i : s, α i) (∀ i, α i) (fun f i => f i) fun _ => True :=
@@ -285,36 +285,6 @@ theorem setOf_or {p q : α → Prop} : { a | p a ∨ q a } = { a | p a } ∪ { a
 /-! ### Subset and strict subset relations -/
 
 
-instance : IsRefl (Set α) (· ⊆ ·) :=
-  show IsRefl (Set α) (· ≤ ·) by infer_instance
-
-instance : IsTrans (Set α) (· ⊆ ·) :=
-  show IsTrans (Set α) (· ≤ ·) by infer_instance
-
-instance : Trans ((· ⊆ ·) : Set α → Set α → Prop) (· ⊆ ·) (· ⊆ ·) :=
-  show Trans (· ≤ ·) (· ≤ ·) (· ≤ ·) by infer_instance
-
-instance : IsAntisymm (Set α) (· ⊆ ·) :=
-  show IsAntisymm (Set α) (· ≤ ·) by infer_instance
-
-instance : IsIrrefl (Set α) (· ⊂ ·) :=
-  show IsIrrefl (Set α) (· < ·) by infer_instance
-
-instance : IsTrans (Set α) (· ⊂ ·) :=
-  show IsTrans (Set α) (· < ·) by infer_instance
-
-instance : Trans ((· ⊂ ·) : Set α → Set α → Prop) (· ⊂ ·) (· ⊂ ·) :=
-  show Trans (· < ·) (· < ·) (· < ·) by infer_instance
-
-instance : Trans ((· ⊂ ·) : Set α → Set α → Prop) (· ⊆ ·) (· ⊂ ·) :=
-  show Trans (· < ·) (· ≤ ·) (· < ·) by infer_instance
-
-instance : Trans ((· ⊆ ·) : Set α → Set α → Prop) (· ⊂ ·) (· ⊂ ·) :=
-  show Trans (· ≤ ·) (· < ·) (· < ·) by infer_instance
-
-instance : IsAsymm (Set α) (· ⊂ ·) :=
-  show IsAsymm (Set α) (· < ·) by infer_instance
-
 instance : IsNonstrictStrictOrder (Set α) (· ⊆ ·) (· ⊂ ·) :=
   ⟨fun _ _ => Iff.rfl⟩
 
@@ -322,10 +292,6 @@ instance : IsNonstrictStrictOrder (Set α) (· ⊆ ·) (· ⊂ ·) :=
 theorem subset_def : (s ⊆ t) = ∀ x, x ∈ s → x ∈ t :=
   rfl
 #align set.subset_def Set.subset_def
-
-theorem ssubset_def : (s ⊂ t) = (s ⊆ t ∧ ¬t ⊆ s) :=
-  rfl
-#align set.ssubset_def Set.ssubset_def
 
 @[refl]
 theorem Subset.refl (a : Set α) : a ⊆ a := fun _ => id
@@ -335,9 +301,18 @@ theorem Subset.rfl {s : Set α} : s ⊆ s :=
   Subset.refl s
 #align set.subset.rfl Set.Subset.rfl
 
+instance : IsRefl (Set α) (· ⊆ ·) where
+  refl _ := Subset.rfl
+
 @[trans]
 theorem Subset.trans {a b c : Set α} (ab : a ⊆ b) (bc : b ⊆ c) : a ⊆ c := fun _ h => bc <| ab h
 #align set.subset.trans Set.Subset.trans
+
+instance : IsTrans (Set α) (· ⊆ ·) where
+  trans _ _ _ hab hbc := Subset.trans hab hbc
+
+instance : Trans ((· ⊆ ·) : Set α → Set α → Prop) (· ⊆ ·) (· ⊆ ·) where
+  trans hab hbc := Subset.trans hab hbc
 
 @[trans]
 theorem mem_of_eq_of_mem {x y : α} {s : Set α} (hx : x = y) (h : y ∈ s) : x ∈ s :=
@@ -357,6 +332,9 @@ theorem eq_of_subset_of_subset {a b : Set α} : a ⊆ b → b ⊆ a → a = b :=
   Subset.antisymm
 #align set.eq_of_subset_of_subset Set.eq_of_subset_of_subset
 
+instance : IsAntisymm (Set α) (· ⊆ ·) where
+  antisymm _ _ hab hba := Subset.antisymm hab hba
+
 theorem mem_of_subset_of_mem {s₁ s₂ : Set α} {a : α} (h : s₁ ⊆ s₂) : a ∈ s₁ → a ∈ s₂ :=
   @h _
 #align set.mem_of_subset_of_mem Set.mem_of_subset_of_mem
@@ -369,12 +347,36 @@ theorem not_subset : ¬s ⊆ t ↔ ∃ a ∈ s, a ∉ t := by
   simp only [subset_def, not_forall, exists_prop]
 #align set.not_subset Set.not_subset
 
-lemma eq_of_forall_subset_iff (h : ∀ u, s ⊆ u ↔ t ⊆ u) : s = t := eq_of_forall_ge_iff h
+lemma eq_of_forall_subset_iff (h : ∀ u, s ⊆ u ↔ t ⊆ u) : s = t :=
+  ((h _).2 Subset.rfl).antisymm ((h _).1 Subset.rfl)
+
 
 /-! ### Definition of strict subsets `s ⊂ t` and basic properties. -/
 
+theorem ssubset_def : (s ⊂ t) = (s ⊆ t ∧ ¬t ⊆ s) :=
+  rfl
+#align set.ssubset_def Set.ssubset_def
+
+-- instance : IsIrrefl (Set α) (· ⊂ ·) :=
+--   show IsIrrefl (Set α) (· < ·) by infer_instance
+
+-- instance : IsTrans (Set α) (· ⊂ ·) :=
+--   show IsTrans (Set α) (· < ·) by infer_instance
+
+-- instance : Trans ((· ⊂ ·) : Set α → Set α → Prop) (· ⊂ ·) (· ⊂ ·) :=
+--   show Trans (· < ·) (· < ·) (· < ·) by infer_instance
+
+-- instance : Trans ((· ⊂ ·) : Set α → Set α → Prop) (· ⊆ ·) (· ⊂ ·) :=
+--   show Trans (· < ·) (· ≤ ·) (· < ·) by infer_instance
+
+-- instance : Trans ((· ⊆ ·) : Set α → Set α → Prop) (· ⊂ ·) (· ⊂ ·) :=
+--   show Trans (· ≤ ·) (· < ·) (· < ·) by infer_instance
+
+-- instance : IsAsymm (Set α) (· ⊂ ·) :=
+--   show IsAsymm (Set α) (· < ·) by infer_instance
+
 protected theorem eq_or_ssubset_of_subset (h : s ⊆ t) : s = t ∨ s ⊂ t :=
-  eq_or_lt_of_le h
+  h.eq_or_ssubset
 #align set.eq_or_ssubset_of_subset Set.eq_or_ssubset_of_subset
 
 theorem exists_of_ssubset {s t : Set α} (h : s ⊂ t) : ∃ x ∈ t, x ∉ s :=
@@ -382,7 +384,7 @@ theorem exists_of_ssubset {s t : Set α} (h : s ⊂ t) : ∃ x ∈ t, x ∉ s :=
 #align set.exists_of_ssubset Set.exists_of_ssubset
 
 protected theorem ssubset_iff_subset_ne {s t : Set α} : s ⊂ t ↔ s ⊆ t ∧ s ≠ t :=
-  @lt_iff_le_and_ne (Set α) _ s t
+  ssubset_iff_subset_ne
 #align set.ssubset_iff_subset_ne Set.ssubset_iff_subset_ne
 
 theorem ssubset_iff_of_subset {s t : Set α} (h : s ⊆ t) : s ⊂ t ↔ ∃ x ∈ t, x ∉ s :=
@@ -619,8 +621,8 @@ instance (α : Type u) : IsEmpty.{u + 1} (↥(∅ : Set α)) :=
   ⟨fun x => x.2⟩
 
 @[simp]
-theorem empty_ssubset : ∅ ⊂ s ↔ s.Nonempty :=
-  (@bot_lt_iff_ne_bot (Set α) _ _ _).trans nonempty_iff_ne_empty.symm
+theorem empty_ssubset : ∅ ⊂ s ↔ s.Nonempty := by
+  simp [ssubset_def, nonempty_iff_ne_empty, Subset.antisymm_iff]
 #align set.empty_ssubset Set.empty_ssubset
 
 alias ⟨_, Nonempty.empty_ssubset⟩ := empty_ssubset
@@ -658,8 +660,8 @@ theorem subset_univ (s : Set α) : s ⊆ univ := fun _ _ => trivial
 #align set.subset_univ Set.subset_univ
 
 @[simp]
-theorem univ_subset_iff {s : Set α} : univ ⊆ s ↔ s = univ :=
-  @top_le_iff _ _ _ s
+theorem univ_subset_iff {s : Set α} : univ ⊆ s ↔ s = univ := by
+  simp [Subset.antisymm_iff]
 #align set.univ_subset_iff Set.univ_subset_iff
 
 alias ⟨eq_univ_of_univ_subset, _⟩ := univ_subset_iff
@@ -698,8 +700,8 @@ theorem univ_unique [Unique α] : @Set.univ α = {default} :=
   Set.ext fun x => iff_of_true trivial <| Subsingleton.elim x default
 #align set.univ_unique Set.univ_unique
 
-theorem ssubset_univ_iff : s ⊂ univ ↔ s ≠ univ :=
-  lt_top_iff_ne_top (a := s)
+theorem ssubset_univ_iff : s ⊂ univ ↔ s ≠ univ := by
+  simp [ssubset_def]
 #align set.ssubset_univ_iff Set.ssubset_univ_iff
 
 instance nontrivial_of_nonempty [Nonempty α] : Nontrivial (Set α) :=
@@ -775,13 +777,26 @@ theorem union_right_comm (s₁ s₂ s₃ : Set α) : s₁ ∪ s₂ ∪ s₃ = s�
 #align set.union_right_comm Set.union_right_comm
 
 @[simp]
-theorem union_eq_left {s t : Set α} : s ∪ t = s ↔ t ⊆ s :=
-  sup_eq_left
+theorem union_subset_iff {s t u : Set α} : s ∪ t ⊆ u ↔ s ⊆ u ∧ t ⊆ u :=
+  (forall_congr' fun _ => or_imp).trans forall_and
+#align set.union_subset_iff Set.union_subset_iff
+
+@[simp]
+theorem subset_union_left (s t : Set α) : s ⊆ s ∪ t := fun _ => Or.inl
+#align set.subset_union_left Set.subset_union_left
+
+@[simp]
+theorem subset_union_right (s t : Set α) : t ⊆ s ∪ t := fun _ => Or.inr
+#align set.subset_union_right Set.subset_union_right
+
+@[simp]
+theorem union_eq_left {s t : Set α} : s ∪ t = s ↔ t ⊆ s := by
+  simp [Subset.rfl, Subset.antisymm_iff]
 #align set.union_eq_left_iff_subset Set.union_eq_left
 
 @[simp]
-theorem union_eq_right {s t : Set α} : s ∪ t = t ↔ s ⊆ t :=
-  sup_eq_right
+theorem union_eq_right {s t : Set α} : s ∪ t = t ↔ s ⊆ t := by
+  simp [Subset.rfl, Subset.antisymm_iff]
 #align set.union_eq_right_iff_subset Set.union_eq_right
 
 theorem union_eq_self_of_subset_left {s t : Set α} (h : s ⊆ t) : s ∪ t = t :=
@@ -792,22 +807,9 @@ theorem union_eq_self_of_subset_right {s t : Set α} (h : t ⊆ s) : s ∪ t = s
   union_eq_left.mpr h
 #align set.union_eq_self_of_subset_right Set.union_eq_self_of_subset_right
 
-@[simp]
-theorem subset_union_left (s t : Set α) : s ⊆ s ∪ t := fun _ => Or.inl
-#align set.subset_union_left Set.subset_union_left
-
-@[simp]
-theorem subset_union_right (s t : Set α) : t ⊆ s ∪ t := fun _ => Or.inr
-#align set.subset_union_right Set.subset_union_right
-
 theorem union_subset {s t r : Set α} (sr : s ⊆ r) (tr : t ⊆ r) : s ∪ t ⊆ r := fun _ =>
   Or.rec (@sr _) (@tr _)
 #align set.union_subset Set.union_subset
-
-@[simp]
-theorem union_subset_iff {s t u : Set α} : s ∪ t ⊆ u ↔ s ⊆ u ∧ t ⊆ u :=
-  (forall_congr' fun _ => or_imp).trans forall_and
-#align set.union_subset_iff Set.union_subset_iff
 
 @[gcongr]
 theorem union_subset_union {s₁ s₂ t₁ t₂ : Set α} (h₁ : s₁ ⊆ s₂) (h₂ : t₁ ⊆ t₂) :
@@ -833,20 +835,20 @@ theorem subset_union_of_subset_right {s u : Set α} (h : s ⊆ u) (t : Set α) :
 #align set.subset_union_of_subset_right Set.subset_union_of_subset_right
 
 -- Porting note: replaced `⊔` in RHS
-theorem union_congr_left (ht : t ⊆ s ∪ u) (hu : u ⊆ s ∪ t) : s ∪ t = s ∪ u :=
-  sup_congr_left ht hu
+theorem union_congr_left (ht : t ⊆ s ∪ u) (hu : u ⊆ s ∪ t) : s ∪ t = s ∪ u := by
+  simp [Subset.antisymm_iff, *]
 #align set.union_congr_left Set.union_congr_left
 
-theorem union_congr_right (hs : s ⊆ t ∪ u) (ht : t ⊆ s ∪ u) : s ∪ u = t ∪ u :=
-  sup_congr_right hs ht
+theorem union_congr_right (hs : s ⊆ t ∪ u) (ht : t ⊆ s ∪ u) : s ∪ u = t ∪ u := by
+  simp [Subset.antisymm_iff, *]
 #align set.union_congr_right Set.union_congr_right
 
-theorem union_eq_union_iff_left : s ∪ t = s ∪ u ↔ t ⊆ s ∪ u ∧ u ⊆ s ∪ t :=
-  sup_eq_sup_iff_left
+theorem union_eq_union_iff_left : s ∪ t = s ∪ u ↔ t ⊆ s ∪ u ∧ u ⊆ s ∪ t := by
+  simp [Subset.antisymm_iff]
 #align set.union_eq_union_iff_left Set.union_eq_union_iff_left
 
-theorem union_eq_union_iff_right : s ∪ u = t ∪ u ↔ s ⊆ t ∪ u ∧ t ⊆ s ∪ u :=
-  sup_eq_sup_iff_right
+theorem union_eq_union_iff_right : s ∪ u = t ∪ u ↔ s ⊆ t ∪ u ∧ t ⊆ s ∪ u := by
+  simp [Subset.antisymm_iff]
 #align set.union_eq_union_iff_right Set.union_eq_union_iff_right
 
 @[simp]
@@ -856,11 +858,13 @@ theorem union_empty_iff {s t : Set α} : s ∪ t = ∅ ↔ s = ∅ ∧ t = ∅ :
 #align set.union_empty_iff Set.union_empty_iff
 
 @[simp]
-theorem union_univ (s : Set α) : s ∪ univ = univ := sup_top_eq _
+theorem union_univ (s : Set α) : s ∪ univ = univ := by
+  simp [Subset.antisymm_iff]
 #align set.union_univ Set.union_univ
 
 @[simp]
-theorem univ_union (s : Set α) : univ ∪ s = univ := top_sup_eq _
+theorem univ_union (s : Set α) : univ ∪ s = univ := by
+  simp [Subset.antisymm_iff]
 #align set.univ_union Set.univ_union
 
 /-! ### Lemmas about intersection -/
@@ -961,28 +965,30 @@ theorem inter_eq_self_of_subset_right {s t : Set α} : t ⊆ s → s ∩ t = t :
   inter_eq_right.mpr
 #align set.inter_eq_self_of_subset_right Set.inter_eq_self_of_subset_right
 
-theorem inter_congr_left (ht : s ∩ u ⊆ t) (hu : s ∩ t ⊆ u) : s ∩ t = s ∩ u :=
-  inf_congr_left ht hu
+theorem inter_congr_left (ht : s ∩ u ⊆ t) (hu : s ∩ t ⊆ u) : s ∩ t = s ∩ u := by
+  simp [Subset.antisymm_iff, *]
 #align set.inter_congr_left Set.inter_congr_left
 
-theorem inter_congr_right (hs : t ∩ u ⊆ s) (ht : s ∩ u ⊆ t) : s ∩ u = t ∩ u :=
-  inf_congr_right hs ht
+theorem inter_congr_right (hs : t ∩ u ⊆ s) (ht : s ∩ u ⊆ t) : s ∩ u = t ∩ u := by
+  simp [Subset.antisymm_iff, *]
 #align set.inter_congr_right Set.inter_congr_right
 
-theorem inter_eq_inter_iff_left : s ∩ t = s ∩ u ↔ s ∩ u ⊆ t ∧ s ∩ t ⊆ u :=
-  inf_eq_inf_iff_left
+theorem inter_eq_inter_iff_left : s ∩ t = s ∩ u ↔ s ∩ u ⊆ t ∧ s ∩ t ⊆ u := by
+  simp [Subset.antisymm_iff, and_comm]
 #align set.inter_eq_inter_iff_left Set.inter_eq_inter_iff_left
 
-theorem inter_eq_inter_iff_right : s ∩ u = t ∩ u ↔ t ∩ u ⊆ s ∧ s ∩ u ⊆ t :=
-  inf_eq_inf_iff_right
+theorem inter_eq_inter_iff_right : s ∩ u = t ∩ u ↔ t ∩ u ⊆ s ∧ s ∩ u ⊆ t := by
+  simp [Subset.antisymm_iff, and_comm]
 #align set.inter_eq_inter_iff_right Set.inter_eq_inter_iff_right
 
 @[simp, mfld_simps]
-theorem inter_univ (a : Set α) : a ∩ univ = a := inf_top_eq _
+theorem inter_univ (a : Set α) : a ∩ univ = a := by
+  simp [Subset.antisymm_iff, Subset.rfl]
 #align set.inter_univ Set.inter_univ
 
 @[simp, mfld_simps]
-theorem univ_inter (a : Set α) : univ ∩ a = a := top_inf_eq _
+theorem univ_inter (a : Set α) : univ ∩ a = a := by
+  simp [Subset.antisymm_iff, Subset.rfl]
 #align set.univ_inter Set.univ_inter
 
 @[gcongr]
@@ -1501,117 +1507,117 @@ theorem Nonempty.eq_one [Subsingleton α] [One α] {s : Set α} (h : s.Nonempty)
 /-! ### Disjointness -/
 
 
-protected theorem disjoint_iff : Disjoint s t ↔ s ∩ t ⊆ ∅ :=
-  disjoint_iff_inf_le
-#align set.disjoint_iff Set.disjoint_iff
+-- protected theorem disjoint_iff : Disjoint s t ↔ s ∩ t ⊆ ∅ :=
+--   disjoint_iff_inf_le
+-- #align set.disjoint_iff Set.disjoint_iff
 
-theorem disjoint_iff_inter_eq_empty : Disjoint s t ↔ s ∩ t = ∅ :=
-  disjoint_iff
-#align set.disjoint_iff_inter_eq_empty Set.disjoint_iff_inter_eq_empty
+-- theorem disjoint_iff_inter_eq_empty : Disjoint s t ↔ s ∩ t = ∅ :=
+--   disjoint_iff
+-- #align set.disjoint_iff_inter_eq_empty Set.disjoint_iff_inter_eq_empty
 
-theorem _root_.Disjoint.inter_eq : Disjoint s t → s ∩ t = ∅ :=
-  Disjoint.eq_bot
-#align disjoint.inter_eq Disjoint.inter_eq
+-- theorem _root_.Disjoint.inter_eq : Disjoint s t → s ∩ t = ∅ :=
+--   Disjoint.eq_bot
+-- #align disjoint.inter_eq Disjoint.inter_eq
 
-theorem disjoint_left : Disjoint s t ↔ ∀ ⦃a⦄, a ∈ s → a ∉ t :=
-  disjoint_iff_inf_le.trans <| forall_congr' fun _ => not_and
-#align set.disjoint_left Set.disjoint_left
+-- theorem disjoint_left : Disjoint s t ↔ ∀ ⦃a⦄, a ∈ s → a ∉ t :=
+--   disjoint_iff_inf_le.trans <| forall_congr' fun _ => not_and
+-- #align set.disjoint_left Set.disjoint_left
 
-theorem disjoint_right : Disjoint s t ↔ ∀ ⦃a⦄, a ∈ t → a ∉ s := by rw [disjoint_comm, disjoint_left]
-#align set.disjoint_right Set.disjoint_right
+-- theorem disjoint_right : Disjoint s t ↔ ∀ ⦃a⦄, a ∈ t → a ∉ s := by rw [disjoint_comm, disjoint_left]
+-- #align set.disjoint_right Set.disjoint_right
 
-lemma not_disjoint_iff : ¬Disjoint s t ↔ ∃ x, x ∈ s ∧ x ∈ t :=
-  Set.disjoint_iff.not.trans <| not_forall.trans <| exists_congr fun _ ↦ not_not
-#align set.not_disjoint_iff Set.not_disjoint_iff
+-- lemma not_disjoint_iff : ¬Disjoint s t ↔ ∃ x, x ∈ s ∧ x ∈ t :=
+--   Set.disjoint_iff.not.trans <| not_forall.trans <| exists_congr fun _ ↦ not_not
+-- #align set.not_disjoint_iff Set.not_disjoint_iff
 
-lemma not_disjoint_iff_nonempty_inter : ¬ Disjoint s t ↔ (s ∩ t).Nonempty := not_disjoint_iff
-#align set.not_disjoint_iff_nonempty_inter Set.not_disjoint_iff_nonempty_inter
+-- lemma not_disjoint_iff_nonempty_inter : ¬ Disjoint s t ↔ (s ∩ t).Nonempty := not_disjoint_iff
+-- #align set.not_disjoint_iff_nonempty_inter Set.not_disjoint_iff_nonempty_inter
 
-alias ⟨_, Nonempty.not_disjoint⟩ := not_disjoint_iff_nonempty_inter
-#align set.nonempty.not_disjoint Set.Nonempty.not_disjoint
+-- alias ⟨_, Nonempty.not_disjoint⟩ := not_disjoint_iff_nonempty_inter
+-- #align set.nonempty.not_disjoint Set.Nonempty.not_disjoint
 
-lemma disjoint_or_nonempty_inter (s t : Set α) : Disjoint s t ∨ (s ∩ t).Nonempty :=
-  (em _).imp_right not_disjoint_iff_nonempty_inter.1
-#align set.disjoint_or_nonempty_inter Set.disjoint_or_nonempty_inter
+-- lemma disjoint_or_nonempty_inter (s t : Set α) : Disjoint s t ∨ (s ∩ t).Nonempty :=
+--   (em _).imp_right not_disjoint_iff_nonempty_inter.1
+-- #align set.disjoint_or_nonempty_inter Set.disjoint_or_nonempty_inter
 
-lemma disjoint_iff_forall_ne : Disjoint s t ↔ ∀ ⦃a⦄, a ∈ s → ∀ ⦃b⦄, b ∈ t → a ≠ b := by
-  simp only [Ne, disjoint_left, @imp_not_comm _ (_ = _), forall_eq']
-#align set.disjoint_iff_forall_ne Set.disjoint_iff_forall_ne
+-- lemma disjoint_iff_forall_ne : Disjoint s t ↔ ∀ ⦃a⦄, a ∈ s → ∀ ⦃b⦄, b ∈ t → a ≠ b := by
+--   simp only [Ne, disjoint_left, @imp_not_comm _ (_ = _), forall_eq']
+-- #align set.disjoint_iff_forall_ne Set.disjoint_iff_forall_ne
 
-alias ⟨_root_.Disjoint.ne_of_mem, _⟩ := disjoint_iff_forall_ne
-#align disjoint.ne_of_mem Disjoint.ne_of_mem
+-- alias ⟨_root_.Disjoint.ne_of_mem, _⟩ := disjoint_iff_forall_ne
+-- #align disjoint.ne_of_mem Disjoint.ne_of_mem
 
-lemma disjoint_of_subset_left (h : s ⊆ u) (d : Disjoint u t) : Disjoint s t := d.mono_left h
-#align set.disjoint_of_subset_left Set.disjoint_of_subset_left
-lemma disjoint_of_subset_right (h : t ⊆ u) (d : Disjoint s u) : Disjoint s t := d.mono_right h
-#align set.disjoint_of_subset_right Set.disjoint_of_subset_right
+-- lemma disjoint_of_subset_left (h : s ⊆ u) (d : Disjoint u t) : Disjoint s t := d.mono_left h
+-- #align set.disjoint_of_subset_left Set.disjoint_of_subset_left
+-- lemma disjoint_of_subset_right (h : t ⊆ u) (d : Disjoint s u) : Disjoint s t := d.mono_right h
+-- #align set.disjoint_of_subset_right Set.disjoint_of_subset_right
 
-lemma disjoint_of_subset (hs : s₁ ⊆ s₂) (ht : t₁ ⊆ t₂) (h : Disjoint s₂ t₂) : Disjoint s₁ t₁ :=
-  h.mono hs ht
-#align set.disjoint_of_subset Set.disjoint_of_subset
+-- lemma disjoint_of_subset (hs : s₁ ⊆ s₂) (ht : t₁ ⊆ t₂) (h : Disjoint s₂ t₂) : Disjoint s₁ t₁ :=
+--   h.mono hs ht
+-- #align set.disjoint_of_subset Set.disjoint_of_subset
 
-@[simp]
-lemma disjoint_union_left : Disjoint (s ∪ t) u ↔ Disjoint s u ∧ Disjoint t u := disjoint_sup_left
-#align set.disjoint_union_left Set.disjoint_union_left
+-- @[simp]
+-- lemma disjoint_union_left : Disjoint (s ∪ t) u ↔ Disjoint s u ∧ Disjoint t u := disjoint_sup_left
+-- #align set.disjoint_union_left Set.disjoint_union_left
 
-@[simp]
-lemma disjoint_union_right : Disjoint s (t ∪ u) ↔ Disjoint s t ∧ Disjoint s u := disjoint_sup_right
-#align set.disjoint_union_right Set.disjoint_union_right
+-- @[simp]
+-- lemma disjoint_union_right : Disjoint s (t ∪ u) ↔ Disjoint s t ∧ Disjoint s u := disjoint_sup_right
+-- #align set.disjoint_union_right Set.disjoint_union_right
 
-@[simp] lemma disjoint_empty (s : Set α) : Disjoint s ∅ := disjoint_bot_right
-#align set.disjoint_empty Set.disjoint_empty
-@[simp] lemma empty_disjoint (s : Set α) : Disjoint ∅ s := disjoint_bot_left
-#align set.empty_disjoint Set.empty_disjoint
+-- @[simp] lemma disjoint_empty (s : Set α) : Disjoint s ∅ := disjoint_bot_right
+-- #align set.disjoint_empty Set.disjoint_empty
+-- @[simp] lemma empty_disjoint (s : Set α) : Disjoint ∅ s := disjoint_bot_left
+-- #align set.empty_disjoint Set.empty_disjoint
 
-@[simp] lemma univ_disjoint : Disjoint univ s ↔ s = ∅ := top_disjoint
-#align set.univ_disjoint Set.univ_disjoint
-@[simp] lemma disjoint_univ : Disjoint s univ ↔ s = ∅ := disjoint_top
-#align set.disjoint_univ Set.disjoint_univ
+-- @[simp] lemma univ_disjoint : Disjoint univ s ↔ s = ∅ := top_disjoint
+-- #align set.univ_disjoint Set.univ_disjoint
+-- @[simp] lemma disjoint_univ : Disjoint s univ ↔ s = ∅ := disjoint_top
+-- #align set.disjoint_univ Set.disjoint_univ
 
-lemma disjoint_sdiff_left : Disjoint (t \ s) s := disjoint_sdiff_self_left
-#align set.disjoint_sdiff_left Set.disjoint_sdiff_left
+-- lemma disjoint_sdiff_left : Disjoint (t \ s) s := disjoint_sdiff_self_left
+-- #align set.disjoint_sdiff_left Set.disjoint_sdiff_left
 
-lemma disjoint_sdiff_right : Disjoint s (t \ s) := disjoint_sdiff_self_right
-#align set.disjoint_sdiff_right Set.disjoint_sdiff_right
+-- lemma disjoint_sdiff_right : Disjoint s (t \ s) := disjoint_sdiff_self_right
+-- #align set.disjoint_sdiff_right Set.disjoint_sdiff_right
 
--- TODO: prove this in terms of a lattice lemma
-theorem disjoint_sdiff_inter : Disjoint (s \ t) (s ∩ t) :=
-  disjoint_of_subset_right (inter_subset_right _ _) disjoint_sdiff_left
-#align set.disjoint_sdiff_inter Set.disjoint_sdiff_inter
+-- -- TODO: prove this in terms of a lattice lemma
+-- theorem disjoint_sdiff_inter : Disjoint (s \ t) (s ∩ t) :=
+--   disjoint_of_subset_right (inter_subset_right _ _) disjoint_sdiff_left
+-- #align set.disjoint_sdiff_inter Set.disjoint_sdiff_inter
 
-theorem diff_union_diff_cancel (hts : t ⊆ s) (hut : u ⊆ t) : s \ t ∪ t \ u = s \ u :=
-  sdiff_sup_sdiff_cancel hts hut
-#align set.diff_union_diff_cancel Set.diff_union_diff_cancel
+-- theorem diff_union_diff_cancel (hts : t ⊆ s) (hut : u ⊆ t) : s \ t ∪ t \ u = s \ u :=
+--   sdiff_sup_sdiff_cancel hts hut
+-- #align set.diff_union_diff_cancel Set.diff_union_diff_cancel
 
-theorem diff_diff_eq_sdiff_union (h : u ⊆ s) : s \ (t \ u) = s \ t ∪ u := sdiff_sdiff_eq_sdiff_sup h
-#align set.diff_diff_eq_sdiff_union Set.diff_diff_eq_sdiff_union
+-- theorem diff_diff_eq_sdiff_union (h : u ⊆ s) : s \ (t \ u) = s \ t ∪ u := sdiff_sdiff_eq_sdiff_sup h
+-- #align set.diff_diff_eq_sdiff_union Set.diff_diff_eq_sdiff_union
 
-@[simp default+1]
-lemma disjoint_singleton_left : Disjoint {a} s ↔ a ∉ s := by simp [Set.disjoint_iff, subset_def]
-#align set.disjoint_singleton_left Set.disjoint_singleton_left
+-- @[simp default+1]
+-- lemma disjoint_singleton_left : Disjoint {a} s ↔ a ∉ s := by simp [Set.disjoint_iff, subset_def]
+-- #align set.disjoint_singleton_left Set.disjoint_singleton_left
 
-@[simp]
-lemma disjoint_singleton_right : Disjoint s {a} ↔ a ∉ s :=
-  disjoint_comm.trans disjoint_singleton_left
-#align set.disjoint_singleton_right Set.disjoint_singleton_right
+-- @[simp]
+-- lemma disjoint_singleton_right : Disjoint s {a} ↔ a ∉ s :=
+--   disjoint_comm.trans disjoint_singleton_left
+-- #align set.disjoint_singleton_right Set.disjoint_singleton_right
 
-lemma disjoint_singleton : Disjoint ({a} : Set α) {b} ↔ a ≠ b :=
-  by simp
-#align set.disjoint_singleton Set.disjoint_singleton
+-- lemma disjoint_singleton : Disjoint ({a} : Set α) {b} ↔ a ≠ b :=
+--   by simp
+-- #align set.disjoint_singleton Set.disjoint_singleton
 
-lemma subset_diff : s ⊆ t \ u ↔ s ⊆ t ∧ Disjoint s u := le_iff_subset.symm.trans le_sdiff
-#align set.subset_diff Set.subset_diff
+-- lemma subset_diff : s ⊆ t \ u ↔ s ⊆ t ∧ Disjoint s u := le_iff_subset.symm.trans le_sdiff
+-- #align set.subset_diff Set.subset_diff
 
-lemma ssubset_iff_sdiff_singleton : s ⊂ t ↔ ∃ a ∈ t, s ⊆ t \ {a} := by
-  simp [ssubset_iff_insert, subset_diff, insert_subset_iff]; aesop
+-- lemma ssubset_iff_sdiff_singleton : s ⊂ t ↔ ∃ a ∈ t, s ⊆ t \ {a} := by
+--   simp [ssubset_iff_insert, subset_diff, insert_subset_iff]; aesop
 
-theorem inter_diff_distrib_left (s t u : Set α) : s ∩ (t \ u) = (s ∩ t) \ (s ∩ u) :=
-  inf_sdiff_distrib_left _ _ _
-#align set.inter_diff_distrib_left Set.inter_diff_distrib_left
+-- theorem inter_diff_distrib_left (s t u : Set α) : s ∩ (t \ u) = (s ∩ t) \ (s ∩ u) :=
+--   inf_sdiff_distrib_left _ _ _
+-- #align set.inter_diff_distrib_left Set.inter_diff_distrib_left
 
-theorem inter_diff_distrib_right (s t u : Set α) : s \ t ∩ u = (s ∩ u) \ (t ∩ u) :=
-  inf_sdiff_distrib_right _ _ _
-#align set.inter_diff_distrib_right Set.inter_diff_distrib_right
+-- theorem inter_diff_distrib_right (s t u : Set α) : s \ t ∩ u = (s ∩ u) \ (t ∩ u) :=
+--   inf_sdiff_distrib_right _ _ _
+-- #align set.inter_diff_distrib_right Set.inter_diff_distrib_right
 
 /-! ### Lemmas about complement -/
 
