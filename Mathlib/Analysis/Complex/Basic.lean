@@ -55,10 +55,10 @@ theorem norm_eq_abs (z : ℂ) : ‖z‖ = abs z :=
 
 lemma norm_I : ‖I‖ = 1 := abs_I
 
-theorem norm_exp_ofReal_mul_I (t : ℝ) : ‖exp (t * I)‖ = 1 := by
-  simp only [norm_eq_abs, abs_exp_ofReal_mul_I]
-set_option linter.uppercaseLean3 false in
-#align complex.norm_exp_of_real_mul_I Complex.norm_exp_ofReal_mul_I
+-- theorem norm_exp_ofReal_mul_I (t : ℝ) : ‖exp (t * I)‖ = 1 := by
+--   simp only [norm_eq_abs, abs_exp_ofReal_mul_I]
+-- set_option linter.uppercaseLean3 false in
+-- #align complex.norm_exp_of_real_mul_I Complex.norm_exp_ofReal_mul_I
 
 instance instNormedAddCommGroup : NormedAddCommGroup ℂ :=
   AddGroupNorm.toNormedAddCommGroup
@@ -67,6 +67,7 @@ instance instNormedAddCommGroup : NormedAddCommGroup ℂ :=
       neg' := abs.map_neg
       eq_zero_of_map_eq_zero' := fun _ => abs.eq_zero.1 }
 
+#minimize_imports
 instance : NormedField ℂ where
   dist_eq _ _ := rfl
   norm_mul' := map_mul abs
@@ -76,33 +77,39 @@ instance : DenselyNormedField ℂ where
     let ⟨x, h⟩ := exists_between hr
     ⟨x, by rwa [norm_eq_abs, abs_ofReal, abs_of_pos (h₀.trans_lt h.1)]⟩
 
+#minimize_imports
 instance {R : Type*} [NormedField R] [NormedAlgebra R ℝ] : NormedAlgebra R ℂ where
   norm_smul_le r x := by
     rw [← algebraMap_smul ℝ r x, real_smul, norm_mul, norm_eq_abs, abs_ofReal, ← Real.norm_eq_abs,
       norm_algebraMap']
 
+#minimize_imports
 variable {E : Type*} [SeminormedAddCommGroup E] [NormedSpace ℂ E]
 
--- see Note [lower instance priority]
-/-- The module structure from `Module.complexToReal` is a normed space. -/
-instance (priority := 900) _root_.NormedSpace.complexToReal : NormedSpace ℝ E :=
-  NormedSpace.restrictScalars ℝ ℂ E
-#align normed_space.complex_to_real NormedSpace.complexToReal
+-- -- see Note [lower instance priority]
+-- /-- The module structure from `Module.complexToReal` is a normed space. -/
+-- instance (priority := 900) _root_.NormedSpace.complexToReal : NormedSpace ℝ E :=
+--   NormedSpace.restrictScalars ℝ ℂ E
+-- #align normed_space.complex_to_real NormedSpace.complexToReal
 
--- see Note [lower instance priority]
-/-- The algebra structure from `Algebra.complexToReal` is a normed algebra. -/
-instance (priority := 900) _root_.NormedAlgebra.complexToReal {A : Type*} [SeminormedRing A]
-    [NormedAlgebra ℂ A] : NormedAlgebra ℝ A :=
-  NormedAlgebra.restrictScalars ℝ ℂ A
+#minimize_imports
+-- -- see Note [lower instance priority]
+-- /-- The algebra structure from `Algebra.complexToReal` is a normed algebra. -/
+-- instance (priority := 900) _root_.NormedAlgebra.complexToReal {A : Type*} [SeminormedRing A]
+--     [NormedAlgebra ℂ A] : NormedAlgebra ℝ A :=
+--   NormedAlgebra.restrictScalars ℝ ℂ A
 
+-- #minimize_imports
 theorem dist_eq (z w : ℂ) : dist z w = abs (z - w) :=
   rfl
 #align complex.dist_eq Complex.dist_eq
+#minimize_imports
 
 theorem dist_eq_re_im (z w : ℂ) : dist z w = √((z.re - w.re) ^ 2 + (z.im - w.im) ^ 2) := by
   rw [sq, sq]
   rfl
 #align complex.dist_eq_re_im Complex.dist_eq_re_im
+#minimize_imports
 
 @[simp]
 theorem dist_mk (x₁ y₁ x₂ y₂ : ℝ) :
@@ -110,6 +117,7 @@ theorem dist_mk (x₁ y₁ x₂ y₂ : ℝ) :
   dist_eq_re_im _ _
 #align complex.dist_mk Complex.dist_mk
 
+#minimize_imports
 theorem dist_of_re_eq {z w : ℂ} (h : z.re = w.re) : dist z w = dist z.im w.im := by
   rw [dist_eq_re_im, h, sub_self, zero_pow two_ne_zero, zero_add, Real.sqrt_sq_eq_abs, Real.dist_eq]
 #align complex.dist_of_re_eq Complex.dist_of_re_eq
@@ -122,6 +130,7 @@ theorem edist_of_re_eq {z w : ℂ} (h : z.re = w.re) : edist z w = edist z.im w.
   rw [edist_nndist, edist_nndist, nndist_of_re_eq h]
 #align complex.edist_of_re_eq Complex.edist_of_re_eq
 
+#minimize_imports
 theorem dist_of_im_eq {z w : ℂ} (h : z.im = w.im) : dist z w = dist z.re w.re := by
   rw [dist_eq_re_im, h, sub_self, zero_pow two_ne_zero, add_zero, Real.sqrt_sq_eq_abs, Real.dist_eq]
 #align complex.dist_of_im_eq Complex.dist_of_im_eq
@@ -134,6 +143,7 @@ theorem edist_of_im_eq {z w : ℂ} (h : z.im = w.im) : edist z w = edist z.re w.
   rw [edist_nndist, edist_nndist, nndist_of_im_eq h]
 #align complex.edist_of_im_eq Complex.edist_of_im_eq
 
+#minimize_imports
 theorem dist_conj_self (z : ℂ) : dist (conj z) z = 2 * |z.im| := by
   rw [dist_of_re_eq (conj_re z), conj_im, dist_comm, Real.dist_eq, sub_neg_eq_add, ← two_mul,
     _root_.abs_mul, abs_of_pos (zero_lt_two' ℝ)]
@@ -205,6 +215,7 @@ theorem nnnorm_nat (n : ℕ) : ‖(n : ℂ)‖₊ = n :=
 theorem nnnorm_int (n : ℤ) : ‖(n : ℂ)‖₊ = ‖n‖₊ :=
   Subtype.ext norm_int
 #align complex.nnnorm_int Complex.nnnorm_int
+#minimize_imports
 
 theorem nnnorm_eq_one_of_pow_eq_one {ζ : ℂ} {n : ℕ} (h : ζ ^ n = 1) (hn : n ≠ 0) : ‖ζ‖₊ = 1 :=
   (pow_left_inj zero_le' zero_le' hn).1 <| by rw [← nnnorm_pow, h, nnnorm_one, one_pow]
@@ -265,16 +276,19 @@ theorem tendsto_normSq_cocompact_atTop : Tendsto normSq (cocompact ℂ) atTop :=
 #align complex.tendsto_norm_sq_cocompact_at_top Complex.tendsto_normSq_cocompact_atTop
 
 open ContinuousLinearMap
+#minimize_imports
 
 /-- Continuous linear map version of the real part function, from `ℂ` to `ℝ`. -/
 def reCLM : ℂ →L[ℝ] ℝ :=
   reLm.mkContinuous 1 fun x => by simp [abs_re_le_abs]
 #align complex.re_clm Complex.reCLM
+#minimize_imports
 
 @[continuity, fun_prop]
 theorem continuous_re : Continuous re :=
   reCLM.continuous
 #align complex.continuous_re Complex.continuous_re
+#minimize_imports
 
 @[simp]
 theorem reCLM_coe : (reCLM : ℂ →ₗ[ℝ] ℝ) = reLm :=
@@ -412,6 +426,7 @@ theorem ringHom_eq_ofReal_of_continuous {f : ℝ →+* ℂ} (h : Continuous f) :
     (Algebra.ofId ℝ ℂ)
 #align complex.ring_hom_eq_of_real_of_continuous Complex.ringHom_eq_ofReal_of_continuous
 
+#minimize_imports
 /-- Continuous linear map version of the canonical embedding of `ℝ` in `ℂ`. -/
 def ofRealCLM : ℝ →L[ℝ] ℂ :=
   ofRealLI.toContinuousLinearMap
@@ -516,6 +531,7 @@ end ComplexOrder
 
 end Complex
 
+#minimize_imports
 namespace RCLike
 
 open ComplexConjugate
@@ -622,6 +638,7 @@ end tsum
 
 end RCLike
 
+#minimize_imports
 namespace Complex
 
 /-!
@@ -757,3 +774,6 @@ lemma mem_slitPlane_of_norm_lt_one {z : ℂ} (hz : ‖z‖ < 1) : 1 + z ∈ slit
 end slitPlane
 
 end Complex
+open Complex
+#show_unused continuous_re continuous_ofReal comap_abs_nhds_zero
+#minimize_imports
