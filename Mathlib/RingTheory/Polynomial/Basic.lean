@@ -11,7 +11,6 @@ import Mathlib.Algebra.Polynomial.BigOperators
 import Mathlib.Algebra.Polynomial.RingDivision
 import Mathlib.GroupTheory.GroupAction.Ring
 import Mathlib.RingTheory.Noetherian.Defs
-import Mathlib.RingTheory.UniqueFactorizationDomain
 
 /-!
 # Ring-theoretic supplement of Algebra.Polynomial.
@@ -21,8 +20,6 @@ import Mathlib.RingTheory.UniqueFactorizationDomain
   If a ring is an integral domain, then so is its polynomial ring over finitely many variables.
 * `Polynomial.isNoetherianRing`:
   Hilbert basis theorem, that if a ring is noetherian then so is its polynomial ring.
-* `Polynomial.wfDvdMonoid`:
-  If an integral domain is a `WFDvdMonoid`, then so is its polynomial ring.
 -/
 
 noncomputable section
@@ -869,42 +866,6 @@ end MvPolynomial
 
 end Prime
 
-namespace Polynomial
-
-instance (priority := 100) wfDvdMonoid {R : Type*} [CommRing R] [IsDomain R] [WfDvdMonoid R] :
-    WfDvdMonoid R[X] where
-  wf := by
-    classical
-      refine
-        RelHomClass.wellFounded
-          (⟨fun p : R[X] =>
-              ((if p = 0 then ⊤ else ↑p.degree : WithTop (WithBot ℕ)), p.leadingCoeff), ?_⟩ :
-            DvdNotUnit →r Prod.Lex (· < ·) DvdNotUnit)
-          (wellFounded_lt.prod_lex ‹WfDvdMonoid R›.wf)
-      rintro a b ⟨ane0, ⟨c, ⟨not_unit_c, rfl⟩⟩⟩
-      dsimp
-      rw [Polynomial.degree_mul, if_neg ane0]
-      split_ifs with hac
-      · rw [hac, Polynomial.leadingCoeff_zero]
-        apply Prod.Lex.left
-        exact WithTop.coe_lt_top _
-      have cne0 : c ≠ 0 := right_ne_zero_of_mul hac
-      simp only [cne0, ane0, Polynomial.leadingCoeff_mul]
-      by_cases hdeg : c.degree = (0 : ℕ)
-      · simp only [hdeg, Nat.cast_zero, add_zero]
-        refine Prod.Lex.right _ ⟨?_, ⟨c.leadingCoeff, fun unit_c => not_unit_c ?_, rfl⟩⟩
-        · rwa [Ne, Polynomial.leadingCoeff_eq_zero]
-        rw [Polynomial.isUnit_iff, Polynomial.eq_C_of_degree_eq_zero hdeg]
-        use c.leadingCoeff, unit_c
-        rw [Polynomial.leadingCoeff, Polynomial.natDegree_eq_of_degree_eq_some hdeg]
-      · apply Prod.Lex.left
-        rw [Polynomial.degree_eq_natDegree cne0] at *
-        simp only [Nat.cast_inj] at hdeg
-        rw [WithTop.coe_lt_coe, Polynomial.degree_eq_natDegree ane0, ← Nat.cast_add, Nat.cast_lt]
-        exact lt_add_of_pos_right _ (Nat.pos_of_ne_zero hdeg)
-
-end Polynomial
-
 /-- Hilbert basis theorem: a polynomial ring over a noetherian ring is a noetherian ring. -/
 protected theorem Polynomial.isNoetherianRing [inst : IsNoetherianRing R] : IsNoetherianRing R[X] :=
   isNoetherianRing_iff.2
@@ -982,21 +943,6 @@ protected theorem Polynomial.isNoetherianRing [inst : IsNoetherianRing R] : IsNo
 attribute [instance] Polynomial.isNoetherianRing
 
 namespace Polynomial
-
-theorem exists_irreducible_of_degree_pos {R : Type u} [CommRing R] [IsDomain R] [WfDvdMonoid R]
-    {f : R[X]} (hf : 0 < f.degree) : ∃ g, Irreducible g ∧ g ∣ f :=
-  WfDvdMonoid.exists_irreducible_factor (fun huf => ne_of_gt hf <| degree_eq_zero_of_isUnit huf)
-    fun hf0 => not_lt_of_lt hf <| hf0.symm ▸ (@degree_zero R _).symm ▸ WithBot.bot_lt_coe _
-
-theorem exists_irreducible_of_natDegree_pos {R : Type u} [CommRing R] [IsDomain R] [WfDvdMonoid R]
-    {f : R[X]} (hf : 0 < f.natDegree) : ∃ g, Irreducible g ∧ g ∣ f :=
-  exists_irreducible_of_degree_pos <| by
-    contrapose! hf
-    exact natDegree_le_of_degree_le hf
-
-theorem exists_irreducible_of_natDegree_ne_zero {R : Type u} [CommRing R] [IsDomain R]
-    [WfDvdMonoid R] {f : R[X]} (hf : f.natDegree ≠ 0) : ∃ g, Irreducible g ∧ g ∣ f :=
-  exists_irreducible_of_natDegree_pos <| Nat.pos_of_ne_zero hf
 
 theorem linearIndependent_powers_iff_aeval (f : M →ₗ[R] M) (v : M) :
     (LinearIndependent R fun n : ℕ => (f ^ n) v) ↔ ∀ p : R[X], aeval f p v = 0 → p = 0 := by
