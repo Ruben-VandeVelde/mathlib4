@@ -545,6 +545,31 @@ lemma prod_eq_one_iff_of_one_le (hf : 1 ≤ f) : ∏ i, f i = 1 ↔ f = 1 :=
 lemma prod_eq_one_iff_of_le_one (hf : f ≤ 1) : ∏ i, f i = 1 ↔ f = 1 :=
   (Finset.prod_eq_one_iff_of_le_one' fun i _ ↦ hf i).trans <| by simp [funext_iff]
 
+@[to_additive sum_pos_iff_of_nonneg]
+lemma one_lt_prod_iff_of_one_le (hf : 1 ≤ f) : 1 < ∏ i, f i ↔ 1 < f := by
+  rw [Finset.one_lt_prod_iff_of_one_le (by simpa using hf)]
+  simp [Pi.lt_def, hf]
+
+omit [IsOrderedMonoid M] in
+variable [CanonicallyOrderedMul M] in
+@[to_additive sum_pos_iff]
+lemma one_lt_prod_iff : 1 < ∏ i, f i ↔ 1 < f :=
+  have := CanonicallyOrderedMul.toIsOrderedMonoid (α := M)
+  one_lt_prod_iff_of_one_le (by simp [Pi.le_def])
+
+@[to_additive]
+lemma prod_lt_one_iff_of_le_one (hf : f ≤ 1) : ∏ i, f i < 1 ↔ f < 1 := by
+  rw [Finset.prod_lt_one_iff_of_le_one (by simpa using hf)]
+  simp [Pi.lt_def, hf]
+
+@[to_additive sum_pos]
+lemma one_lt_prod (hf : 1 < f) : 1 < ∏ i, f i :=
+  one_lt_prod_iff_of_one_le hf.le |>.mpr hf
+
+@[to_additive]
+lemma prod_lt_one (hf : f < 1) : ∏ i, f i < 1 :=
+  prod_lt_one_iff_of_le_one hf.le |>.mpr hf
+
 end OrderedCommMonoid
 
 section OrderedCancelCommMonoid
@@ -552,27 +577,13 @@ variable [Fintype ι] [CommMonoid M] [PartialOrder M] [IsOrderedCancelMonoid M] 
 
 @[to_additive sum_strictMono]
 theorem prod_strictMono' : StrictMono fun f : ι → M ↦ ∏ x, f x :=
-  fun _ _ hfg ↦
+  fun f g hfg ↦ by
+  simp only
   let ⟨hle, i, hlt⟩ := Pi.lt_def.mp hfg
-  Finset.prod_lt_prod' (fun i _ ↦ hle i) ⟨i, Finset.mem_univ i, hlt⟩
-
-@[to_additive sum_pos]
-lemma one_lt_prod (hf : 1 < f) : 1 < ∏ i, f i :=
-  Finset.one_lt_prod' (fun _ _ ↦ hf.le _) <| by simpa using (Pi.lt_def.1 hf).2
-
-@[to_additive]
-lemma prod_lt_one (hf : f < 1) : ∏ i, f i < 1 :=
-  Finset.prod_lt_one' (fun _ _ ↦ hf.le _) <| by simpa using (Pi.lt_def.1 hf).2
-
-@[to_additive sum_pos_iff_of_nonneg]
-lemma one_lt_prod_iff_of_one_le (hf : 1 ≤ f) : 1 < ∏ i, f i ↔ 1 < f := by
-  obtain rfl | hf := hf.eq_or_lt <;> simp [*, one_lt_prod]
-
-@[to_additive]
-lemma prod_lt_one_iff_of_le_one (hf : f ≤ 1) : ∏ i, f i < 1 ↔ f < 1 := by
-  obtain rfl | hf := hf.eq_or_lt <;> simp [*, prod_lt_one]
+  exact Finset.prod_lt_prod' (fun i _ ↦ hle i) ⟨i, Finset.mem_univ i, hlt⟩
 
 end OrderedCancelCommMonoid
+
 end Fintype
 
 namespace Multiset
