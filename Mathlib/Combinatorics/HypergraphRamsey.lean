@@ -78,7 +78,130 @@ theorem orderEmbedding_fin_finite {α : Type*} [Preorder α] [LocallyFiniteOrder
   rintro _ ⟨s, (hs : s ⊤ ≤ a), rfl⟩ _ ⟨i, rfl⟩
   exact (s.monotone le_top).trans hs
 
+instance OrderEmbedding.infinite' {α : Type*} [Preorder α] [Nonempty α] [Nonempty (α ↪o ℕ)]
+    : Infinite (α ↪o ℕ) :=
+  let f1 := Classical.arbitrary (α ↪o ℕ)
+  let addRight (i : ℕ) := OrderEmbedding.ofStrictMono (fun n => n + i) (by simp [StrictMono])
+  Infinite.of_injective (fun i ↦ f1.trans <| (addRight i)) fun x y h ↦ by
+    simpa? [addRight] using
+      congrFun (congr_arg (fun f : (α ↪o ℕ) ↦ (f : α → ℕ)) h) (Classical.arbitrary α)
+
+#check OrderEmbedding.infinite (α := ℕ)
+
+lemma aux (α β γ : Type*)
+    [LE α] [Nonempty α]
+    [LE β]
+    [LE γ]
+    [Nonempty (α ↪o β)]
+    (g : ℕ → β ↪o γ)
+    (h : ∀ (b : β) (i j : ℕ), g i b = g j b → i = j) :
+    Infinite (α ↪o γ) :=
+  let f := Classical.arbitrary (α ↪o β)
+  .of_injective (fun i : ℕ => f.trans (g i)) <|
+    fun x y hxy => by
+      let a := (Classical.arbitrary α)
+      apply h (f a)
+      have := congr_fun (congr_arg (fun f : α  ↪o γ => (⇑f)) hxy) a
+      simpa
+
+lemma aux2 (α β γ : Type*)
+    [LE α] [Nonempty α]
+    [LE β]
+    [LE γ]
+    [Nonempty (α ↪o β)]
+    (g : ℕ → β ↪o γ)
+    (h : ∀ b : β, Function.Injective (g · b)) :
+    Infinite (α ↪o γ) :=
+  let f := Classical.arbitrary (α ↪o β)
+  .of_injective (fun i : ℕ => f.trans (g i)) <|
+    fun x y hxy => by
+      let a := (Classical.arbitrary α)
+      apply h (f a)
+      have := congr_fun (congr_arg (fun f : α  ↪o γ => (⇑f)) hxy) a
+      simpa
+
+lemma aux3 (α β : Type*)
+    [LE α] [Nonempty α]
+    [LE β]
+    [Nonempty (α ↪o β)]
+    (g : ℕ → β ↪o ℕ)
+    (h : ∀ b : β, Function.Injective (g · b)) :
+    Infinite (α ↪o ℕ) :=
+  let f := Classical.arbitrary (α ↪o β)
+  .of_injective (fun i : ℕ => f.trans (g i)) <|
+    fun x y hxy => by
+      let a := (Classical.arbitrary α)
+      apply h (f a)
+      have := congr_fun (congr_arg (fun f : α  ↪o ℕ => (⇑f)) hxy) a
+      simpa
+
+lemma aux4 (α β γ : Type*)
+    [Preorder α] [Nonempty α]
+    [Preorder β]
+    [Preorder γ]
+    (f : α ↪o β) :
+    Function.Injective (fun (g : β ↪o γ ) => ⇑(f.trans g)) := by
+  have := f.strictMono
+  have := f.injective
+  simp
+  intro x y hxy
+  apply Function.Surjective.injective_comp_right
+  have := x.strictMono
+  have := y.strictMono
+  have := x.injective
+  have := y.injective
+  simp only at hxy
+  simp at hxy
+  apply?
+
+
+  sorry
+
+    (h : ∀ b : β, Function.Injective (g · b)) :
+    Infinite (α ↪o γ) :=
+  sorry
+-- lemma aux3 (α β γ : Type*)
+--     [LE α] [Nonempty α]
+--     [LE β]
+--     [LE γ]
+--     [Nonempty (α ↪o β)]
+--     (g : β ↪o (ℕ → γ))
+--     (h : ∀ b : β, Function.Injective (g b)) :
+--     Infinite (α ↪o γ) :=
+--   let f := Classical.arbitrary (α ↪o β)
+--   .of_injective (fun i : ℕ => (g · i) ∘ f) <|
+--     fun x y hxy => by
+--       let a := (Classical.arbitrary α)
+--       apply h (f a)
+--       have := congr_fun (congr_arg (fun f : α  ↪o γ => (⇑f)) hxy) a
+--       simpa
+
+#check aux (Fin (k + 1)) ℕ ℕ
+  (fun i : ℕ => OrderEmbedding.ofStrictMono (fun n => n + i) (by simp [StrictMono]))
+  (fun i j => by simp)
+#check aux2 (Fin (k + 1)) ℕ ℕ
+  (fun i : ℕ => OrderEmbedding.ofStrictMono (fun n => n + i) (by simp [StrictMono]))
+  (fun i j => by simp)
+
+-- instance OrderEmbedding.infinite'' {α β γ : Type*}
+--     [Preorder α] [Nonempty α]
+--     [Preorder β] [Nonempty β]
+--     [Preorder γ] [Nonempty γ]
+--     [Nonempty (α ↪o β)]
+--     [Infinite (β ↪o γ)]
+--     : Infinite (α ↪o γ) :=
+--   let f := Classical.arbitrary (α ↪o β)
+--   let g (i : ℕ) : β ↪o γ :=
+--   Infinite.of_injective (f.trans) fun g₁ g₂ h ↦ by
+--     simp [f, RelEmbedding.ext_iff] at h
+--     simpa [addRight] using
+--       congrFun (congr_arg (fun f : (α ↪o ℕ) ↦ (f : α → ℕ)) h) (Classical.arbitrary α)
+
 theorem exists_enum_set_card (k : ℕ) : ∃ (e : ℕ ≃ (Fin (k + 1) ↪o ℕ)), Monotone (e · ⊤) :=
+
+  -- α := Fin (k + 1)
+  let ⟨f⟩ : Nonempty (Fin (k + 1) ↪o ℕ) := inferInstance
+  let : Infinite (Fin (k + 1) ↪o ℕ) := OrderEmbedding.infinite'
   exists_nat_equiv_monotone_comp (α := Fin (k + 1) ↪o ℕ) (fun s ↦ s ⊤)
    fun m ↦ (orderEmbedding_fin_finite k m).subset fun _ (hs : _ = _) ↦ hs.le
 
