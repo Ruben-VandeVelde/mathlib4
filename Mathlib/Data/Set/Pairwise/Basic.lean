@@ -67,9 +67,6 @@ theorem Pairwise.disjoint_extend_bot [PartialOrder γ] [OrderBot γ]
 
 namespace Set
 
-theorem Pairwise.mono (h : t ⊆ s) (hs : s.Pairwise r) : t.Pairwise r :=
-  fun _x xt _y yt => hs (h xt) (h yt)
-
 theorem Pairwise.mono' (H : r ≤ p) (hr : s.Pairwise r) : s.Pairwise p :=
   hr.imp H
 

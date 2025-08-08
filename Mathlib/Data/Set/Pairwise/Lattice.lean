@@ -9,37 +9,13 @@ import Mathlib.Data.Set.Pairwise.Basic
 /-!
 # Relations holding pairwise
 
-In this file we prove many facts about `Pairwise` and the set lattice.
+In this file we prove many facts about `Set.PairwiseDisjoint` and the set lattice.
 -/
 
 
 open Function Set Order
 
 variable {α ι ι' : Type*} {κ : Sort*} {r : α → α → Prop}
-section Pairwise
-
-variable {f : ι → α} {s : Set α}
-
-namespace Set
-
-theorem pairwise_iUnion {f : κ → Set α} (h : Directed (· ⊆ ·) f) :
-    (⋃ n, f n).Pairwise r ↔ ∀ n, (f n).Pairwise r := by
-  constructor
-  · intro H n
-    exact Pairwise.mono (subset_iUnion _ _) H
-  · intro H i hi j hj hij
-    rcases mem_iUnion.1 hi with ⟨m, hm⟩
-    rcases mem_iUnion.1 hj with ⟨n, hn⟩
-    rcases h m n with ⟨p, mp, np⟩
-    exact H p (mp hm) (np hn) hij
-
-theorem pairwise_sUnion {r : α → α → Prop} {s : Set (Set α)} (h : DirectedOn (· ⊆ ·) s) :
-    (⋃₀ s).Pairwise r ↔ ∀ a ∈ s, Set.Pairwise a r := by
-  rw [sUnion_eq_iUnion, pairwise_iUnion h.directed_val, SetCoe.forall]
-
-end Set
-
-end Pairwise
 
 namespace Set
 

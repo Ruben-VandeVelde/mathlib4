@@ -78,6 +78,9 @@ namespace Set
 protected def Pairwise (s : Set α) (r : α → α → Prop) :=
   ∀ ⦃x⦄, x ∈ s → ∀ ⦃y⦄, y ∈ s → x ≠ y → r x y
 
+theorem Pairwise.mono {s t : Set α} (h : t ⊆ s) (hs : s.Pairwise r) : t.Pairwise r :=
+  fun _x xt _y yt => hs (h xt) (h yt)
+
 theorem pairwise_of_forall (s : Set α) (r : α → α → Prop) (h : ∀ a b, r a b) : s.Pairwise r :=
   fun a _ b _ _ => h a b
 

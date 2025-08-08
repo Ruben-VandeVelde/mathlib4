@@ -1164,12 +1164,32 @@ theorem directedOn_sUnion {r} {S : Set (Set α)} (hd : DirectedOn (· ⊆ ·) S)
   rw [sUnion_eq_iUnion]
   exact directedOn_iUnion (directedOn_iff_directed.mp hd) (fun i ↦ h i.1 i.2)
 
+-- TODO: fix naming inconsistency with the iUnion₂ theorems below.
+theorem pairwise_iUnion {κ : Sort*} {r : α → α → Prop} {f : κ → Set α} (hd : Directed (· ⊆ ·) f) :
+    (⋃ n, f n).Pairwise r ↔ ∀ n, (f n).Pairwise r := by
+  constructor
+  · intro H n
+    exact Set.Pairwise.mono (subset_iUnion _ _) H
+  · intro H i hi j hj hij
+    rcases mem_iUnion.1 hi with ⟨m, hm⟩
+    rcases mem_iUnion.1 hj with ⟨n, hn⟩
+    rcases hd m n with ⟨p, mp, np⟩
+    exact H p (mp hm) (np hn) hij
+
 theorem pairwise_iUnion₂ {S : Set (Set α)} (hd : DirectedOn (· ⊆ ·) S)
     (r : α → α → Prop) (h : ∀ s ∈ S, s.Pairwise r) : (⋃ s ∈ S, s).Pairwise r := by
   simp only [Set.Pairwise, Set.mem_iUnion, exists_prop, forall_exists_index, and_imp]
   intro x S hS hx y T hT hy hne
   obtain ⟨U, hU, hSU, hTU⟩ := hd S hS T hT
   exact h U hU (hSU hx) (hTU hy) hne
+
+theorem pairwise_iUnion₂_iff {r : α → α → Prop} {s : Set (Set α)} (hd : DirectedOn (· ⊆ ·) s) :
+    (⋃ a ∈ s, a).Pairwise r ↔ ∀ a ∈ s, a.Pairwise r :=
+  ⟨fun h a ha ↦ h.mono <| subset_iUnion₂_of_subset a ha (by rfl), pairwise_iUnion₂ hd _⟩
+
+theorem pairwise_sUnion {r : α → α → Prop} {s : Set (Set α)} (hd : DirectedOn (· ⊆ ·) s) :
+    (⋃₀ s).Pairwise r ↔ ∀ a ∈ s, Set.Pairwise a r := by
+  rw [sUnion_eq_iUnion, pairwise_iUnion hd.directed_val, SetCoe.forall]
 
 end Directed
 
