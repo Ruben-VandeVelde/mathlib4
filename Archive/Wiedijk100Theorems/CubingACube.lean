@@ -124,9 +124,9 @@ variable {ι : Type} {cs : ι → Cube (n + 1)} {i i' : ι}
 
 /-- A finite family of (at least 2) cubes partitioning the unit cube with different sizes -/
 structure Correct (cs : ι → Cube n) : Prop where
-  PairwiseDisjoint : Pairwise (Disjoint on Cube.toSet ∘ cs)
+  pairwise_disjoint : Pairwise (Disjoint on Cube.toSet ∘ cs)
   iUnion_eq : ⋃ i : ι, (cs i).toSet = unitCube.toSet
-  Injective : Injective (Cube.w ∘ cs)
+  injective : Injective (Cube.w ∘ cs)
   three_le : 3 ≤ n
 
 namespace Correct
@@ -173,7 +173,7 @@ theorem w_ne_one [Nontrivial ι] (i : ι) : (cs i).w ≠ 1 := by
     · apply zero_le_b h
     · apply lt_of_lt_of_le (side_subset h <| (cs i').b_mem_side j).2
       simp [hi, zero_le_b h]
-  exact (h.PairwiseDisjoint hi').le_bot ⟨hp, h2p⟩
+  exact (h.pairwise_disjoint hi').le_bot ⟨hp, h2p⟩
 
 /-- The top of a cube (which is the bottom of the cube shifted up by its width) must be covered by
   bottoms of (other) cubes in the family. -/
@@ -321,7 +321,7 @@ theorem mi_minimal (hi : i ∈ bcubes cs c) : (cs <| mi h v).w ≤ (cs i).w :=
 
 theorem mi_strict_minimal (hii' : mi h v ≠ i) (hi : i ∈ bcubes cs c) :
     (cs <| mi h v).w < (cs i).w :=
-  (mi_minimal hi).lt_of_ne <| h.Injective.ne hii'
+  (mi_minimal hi).lt_of_ne <| h.injective.ne hii'
 
 /-- The top of `mi` cannot be 1, since there is a larger cube in the valley -/
 theorem mi_xm_ne_one : (cs <| mi h v).xm ≠ 1 := by
@@ -494,7 +494,7 @@ theorem valley_mi : Valley cs (cs (mi h v)).shiftUp := by
     rfl
   · intro i' hi' h2i'
     dsimp only [shiftUp] at h2i'
-    replace h2i' := h.Injective h2i'.symm
+    replace h2i' := h.injective h2i'.symm
     induction h2i'
     exact b_ne_xm (cs i) hi'
 
