@@ -108,6 +108,33 @@ def liftFun {A : Type*} [Semiring A] [Algebra R A] (f : X → A) :
   | .mul a b => liftFun f a * liftFun f b
   | .ofScalar c => algebraMap _ _ c
 
+-- R : Type u_1
+-- inst✝² : CommSemiring R
+-- X : Type u_2
+-- A : Type u_3
+-- inst✝¹ : Semiring A
+-- inst✝ : Algebra R A
+#where
+lemma liftFun_add {A : Type*} [Semiring A] [Algebra R A] {f : X → A} {a b : Pre R X} :
+    liftFun R X f (a + b) = liftFun R X f a + liftFun R X f b :=
+  rfl
+
+lemma liftFun_mul {A : Type*} [Semiring A] [Algebra R A] {f : X → A} {a b : Pre R X} :
+    liftFun R X f (a * b) = liftFun R X f a * liftFun R X f b :=
+  rfl
+
+lemma liftFun_ofScalar {A : Type*} [Semiring A] [Algebra R A] {f : X → A} {r : R} :
+    liftFun R X f (Pre.ofScalar r) = algebraMap _ _ r :=
+  rfl
+
+lemma liftFun_zero {A : Type*} [Semiring A] [Algebra R A] {f : X → A} :
+    liftFun R X f 0 = 0 :=
+  map_zero _
+
+lemma liftFun_one {A : Type*} [Semiring A] [Algebra R A] {f : X → A} :
+    liftFun R X f 1 = 1 :=
+  map_one _
+
 /-- An inductively defined relation on `Pre R X` used to force the initial algebra structure on
 the associated quotient.
 -/
@@ -208,6 +235,8 @@ instance instMonoidWithZero : MonoidWithZero (FreeAlgebra R X) where
     rintro ⟨⟩
     exact Quot.sound Rel.mul_zero
 
+private lemma mk_one : (Quot.mk _ 1 : FreeAlgebra R X) = 1 := rfl
+
 instance instDistrib : Distrib (FreeAlgebra R X) where
   left_distrib := by
     rintro ⟨⟩ ⟨⟩ ⟨⟩
@@ -303,6 +332,23 @@ irreducible_def ι : X → FreeAlgebra R X := fun m ↦ Quot.mk _ m
 @[simp]
 theorem quot_mk_eq_ι (m : X) : Quot.mk (FreeAlgebra.Rel R X) m = ι R m := by rw [ι_def]
 
+-- def Quot.liftOn {α β : Sort*} {r : α → α → Prop} (q : Quot r) (f : α → β)
+--   (c : ∀ (a b : α), r a b → f a = f b) : β :=
+--   _root_.Quot.liftOn q  f c
+-- Quot (FreeAlgebra.Rel R X)
+#check FreeAlgebra.Rel R X
+variable {R} in
+def Quot.liftOn {β : Sort*} (q : FreeAlgebra R X) (f : (Pre R X) → β)
+  (c : ∀ (a b : (Pre R X)), ((FreeAlgebra.Rel R X)) a b → f a = f b) : β :=
+  _root_.Quot.liftOn q  f c
+
+@[simp]
+lemma Quot.liftOn_ι {β : Sort*} (x : X) (f : (Pre R X) → β)
+    (c : ∀ (a b : (Pre R X)), ((FreeAlgebra.Rel R X)) a b → f a = f b) :
+    Quot.liftOn (ι R x) f c = f x := by
+  rw [← quot_mk_eq_ι, Quot.liftOn, Quot.liftOn_mk]
+
+
 variable {A : Type*} [Semiring A] [Algebra R A]
 
 /-- Internal definition used to define `lift` -/
@@ -310,38 +356,25 @@ private def liftAux (f : X → A) : FreeAlgebra R X →ₐ[R] A where
   toFun a :=
     Quot.liftOn a (liftFun _ _ f) fun a b h ↦ by
       induction h
-      · exact (algebraMap R A).map_add _ _
-      · exact (algebraMap R A).map_mul _ _
-      · apply Algebra.commutes
-      · change _ + _ + _ = _ + (_ + _)
-        rw [add_assoc]
-      · change _ + _ = _ + _
-        rw [add_comm]
-      · change algebraMap _ _ _ + liftFun R X f _ = liftFun R X f _
-        simp
-      · change _ * _ * _ = _ * (_ * _)
-        rw [mul_assoc]
-      · change algebraMap _ _ _ * liftFun R X f _ = liftFun R X f _
-        simp
-      · change liftFun R X f _ * algebraMap _ _ _ = liftFun R X f _
-        simp
-      · change _ * (_ + _) = _ * _ + _ * _
-        rw [left_distrib]
-      · change (_ + _) * _ = _ * _ + _ * _
-        rw [right_distrib]
-      · change algebraMap _ _ _ * _ = algebraMap _ _ _
-        simp
-      · change _ * algebraMap _ _ _ = algebraMap _ _ _
-        simp
-      repeat
-        change liftFun R X f _ + liftFun R X f _ = _
-        simp only [*]
-        rfl
-      repeat
-        change liftFun R X f _ * liftFun R X f _ = _
-        simp only [*]
-        rfl
+      · simp [liftFun_add, liftFun_ofScalar]
+      · simp [liftFun_mul, liftFun_ofScalar]
+      · simp [liftFun_mul, liftFun_ofScalar, Algebra.commutes]
+      · simp [liftFun_add, add_assoc]
+      · simp [liftFun_add, add_comm]
+      · simp [liftFun_add, liftFun_zero]
+      · simp [liftFun_mul, mul_assoc]
+      · simp [liftFun_mul, liftFun_one]
+      · simp [liftFun_mul, liftFun_one]
+      · simp [liftFun_mul, liftFun_add, left_distrib]
+      · simp [liftFun_mul, liftFun_add, right_distrib]
+      · simp [liftFun_mul, liftFun_zero]
+      · simp [liftFun_mul, liftFun_zero]
+      · simp [liftFun_add, *]
+      · simp [liftFun_add, *]
+      · simp [liftFun_mul, *]
+      · simp [liftFun_mul, *]
   map_one' := by
+    simp
     change algebraMap _ _ _ = _
     simp
   map_mul' := by
@@ -355,6 +388,14 @@ private def liftAux (f : X → A) : FreeAlgebra R X →ₐ[R] A where
     rfl
   commutes' := by tauto
 
+@[simp high]
+private lemma liftAux_mk
+    (f : X → A)
+    (x : X) :
+    (liftAux R f) (Quot.mk (Rel R X) (Pre.of x)) = f x := by
+  rw [quot_mk_eq_ι]
+  rfl
+
 /-- Given a function `f : X → A` where `A` is an `R`-algebra, `lift R f` is the unique lift
 of `f` to a morphism of `R`-algebras `FreeAlgebra R X → A`. -/
 @[irreducible]
@@ -363,13 +404,14 @@ def lift : (X → A) ≃ (FreeAlgebra R X →ₐ[R] A) :=
     invFun := fun F ↦ F ∘ ι R
     left_inv := fun f ↦ by
       ext
-      simp only [Function.comp_apply, ι_def]
-      rfl
+      simp only [Function.comp_apply, ι_def, liftAux_mk]
     right_inv := fun F ↦ by
       ext t
       rcases t with ⟨x⟩
       induction x with
       | of =>
+        simp only [quot_mk_eq_ι]
+        simp only [liftAux_mk]
         change ((F : FreeAlgebra R X → A) ∘ ι R) _ = _
         simp only [Function.comp_apply, ι_def]
       | ofScalar x =>
